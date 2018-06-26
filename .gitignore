@@ -1,5 +1,6 @@
 .idea
 *.sh
+!gglnd.sh
 node_modules
 dist
 npm-debug.log
