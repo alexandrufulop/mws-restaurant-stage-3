@@ -1,0 +1,461 @@
+/* raleway-regular - latin */
+@font-face {
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Raleway'), local('Raleway-Regular'),
+    url('/fonts/raleway-v12-latin-regular.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */ url('/fonts/raleway-v12-latin-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+body,
+html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font: 16px "Raleway", Arial, Helvetica, sans-serif;
+    min-width: 250px;
+}
+
+body,
+p,
+td,
+th {
+}
+
+li, ul {
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    color: #fa892d;
+}
+
+a, a:focus, a:hover {
+    text-decoration: none
+}
+
+a:focus, a:hover {
+    color: #ffc962;
+}
+
+a img {
+    border: 0 none #fff;
+}
+
+article, aside, canvas, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+
+section {
+    width: 100%;
+}
+
+#maincontent {
+    background: #f3f3f3;
+    min-height: 100%;
+    width: 100%;
+    margin: 0 auto;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#footer {
+    position: relative;
+    margin: 1em auto;
+    font: 100% Arial, Helvetica, sans-serif;
+    color: #000;
+    font-size: .9em;
+    padding: 1.2em;
+    text-transform: uppercase;
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ffffff+0,e5e5e5+100;White+3D */
+    background: rgb(255, 255, 255); /* Old browsers */
+    background: -moz-linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(229, 229, 229, 1) 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(229, 229, 229, 1) 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(229, 229, 229, 1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#e5e5e5', GradientType=0); /* IE6-9 */
+    /* End gradient */
+}
+
+#footer, nav {
+    text-align: center;
+}
+
+.filter-options {
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#7abcff+0,60abf8+44,4096ee+100;Blue+3D+%2314 */
+    background: #7abcff; /* Old browsers */
+    background: -moz-linear-gradient(top, #7abcff 0%, #60abf8 44%, #4096ee 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, #7abcff 0%, #60abf8 44%, #4096ee 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, #7abcff 0%, #60abf8 44%, #4096ee 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#7abcff', endColorstr='#4096ee', GradientType=0); /* IE6-9 */
+}
+
+nav {
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#4c4c4c+0,595959+12,666666+25,474747+39,2c2c2c+50,000000+51,111111+60,2b2b2b+76,1c1c1c+91,131313+100;Black+Gloss+%231 */
+    background: #4c4c4c; /* Old browsers */
+    background: -moz-linear-gradient(top, #4c4c4c 0%, #595959 12%, #666 25%, #474747 39%, #2c2c2c 50%, #000 51%, #111 60%, #2b2b2b 76%, #1c1c1c 91%, #131313 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, #4c4c4c 0%, #595959 12%, #666 25%, #474747 39%, #2c2c2c 50%, #000 51%, #111 60%, #2b2b2b 76%, #1c1c1c 91%, #131313 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, #4c4c4c 0%, #595959 12%, #666 25%, #474747 39%, #2c2c2c 50%, #000 51%, #111 60%, #2b2b2b 76%, #1c1c1c 91%, #131313 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#4c4c4c', endColorstr='#131313', GradientType=0); /* IE6-9 */
+}
+
+/* ====================== Navigation ====================== */
+
+/* a11y skip link */
+a.skip-main {
+    left: -9999px;
+    position: absolute;
+    top: auto;
+    width: .1em;
+    height: .1em;
+    overflow: hidden;
+    z-index: -999;
+}
+
+a.skip-main:focus, a.skip-main:active {
+    color: #fff;
+    background: #000;
+    left: auto;
+    top: auto;
+    width: 30%;
+    height: auto;
+    overflow: auto;
+    margin: .1em 35%;
+    padding: .5em;
+    border-radius: 1em;
+    border: .4em solid yellow;
+    text-align: center;
+    font-size: 1.2em;
+    z-index: 999;
+}
+
+#Logo {
+    display: none;
+    z-index: 1;
+}
+
+nav {
+    position: relative;
+    margin: 0;
+    width: 100%;
+    min-height: 85px;
+}
+
+nav h1 {
+    margin: 0;
+    margin-left: 0.3em;
+    padding-top: 1em;
+}
+
+/* Logo Name */
+nav h1 a {
+    color: white;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+}
+
+#breadcrumb {
+    position: relative;
+    line-height: 2em;
+    list-style: none;
+    background: #eee;
+    font-size: 1em;
+    margin: 2em auto 0 0;
+    text-align: left;
+}
+
+/* Display list items side by side */
+#breadcrumb li {
+    display: inline
+}
+
+#breadcrumb li + li:before {
+    padding: .8em;
+    color: #000;
+    content: "/\00a0"
+}
+
+#breadcrumb li a {
+    color: #0275d8;
+    text-decoration: none;
+    margin: 1em;
+}
+
+#breadcrumb li a:hover {
+    color: #01447e;
+    text-decoration: underline
+}
+
+/* ====================== Map ====================== */
+#map {
+    height: 300px;
+    width: 100%;
+    text-align: center;
+}
+
+#map span {
+    top: calc(50% - 70px);
+    position: relative;
+    font-size: 3em;
+}
+
+/* ====================== Restaurant Filtering ====================== */
+
+.filter-options {
+    font: 100% Arial, Helvetica, sans-serif;
+    width: 100%;
+    margin: 0 auto;
+    background: #336edb;
+}
+
+.select-container {
+    display: inline-block;
+    margin-bottom: 1.2em;
+}
+
+.filter-options h2 {
+    margin: 1em;
+    display: inline-block;
+    color: #fff;
+    font-weight: normal;
+    letter-spacing: .1em;
+}
+
+.filter-options select {
+    background: none repeat scroll 0 0 #fff;
+    border: .1em solid #e5e5e5;
+    border-radius: .5em;
+    box-shadow: 0 0 0.5em #e8e8e8 inset;
+    height: 3em;
+    margin: .5em 0 0 1.4em;
+    padding: .8em;
+    min-width: 200px;
+
+}
+
+/* ====================== Restaurant Listing ====================== */
+#restaurants-list {
+    background: #f3f3f3;
+    list-style: outside none none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#restaurants-list li {
+    font: 100% Arial, Helvetica, sans-serif;
+    box-shadow: 0 .8em .8em 0 rgba(0, 0, 0, 0.2), 0 .6em .8em 0 rgba(0, 0, 0, 0.19);
+    transition: 0.5s;
+    border-radius: .8em 0 1em 0;
+    background: #fff;
+    text-align: left;
+    margin: 1em auto;
+}
+
+#restaurants-list .restaurant-img {
+    border-radius: 1em 0 0 0;
+    box-shadow: 0 .8em .8em 0 rgba(0, 0, 0, 0.2);
+    width: 300px;
+    -moz-transition: all 0.3s;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+#restaurants-list .restaurant-img:hover {
+    -moz-transform: scale(1.01);
+    -webkit-transform: scale(1.01);
+    transform: scale(1.01);
+}
+
+#restaurants-list li h1 {
+    text-align: center;
+    color: #336edb;
+    font-weight: 200;
+    font-size: 1.6em;
+    margin: 1em auto;
+    word-break: break-word;
+    width: 200px;
+}
+
+#restaurants-list p {
+    font-weight: bold;
+    margin: 1.2em;
+    word-break: break-word;
+    width: 200px;
+}
+
+#restaurants-list li a {
+    background: #fa892d;
+    border: .2em solid #eee;
+    color: #000;
+    display: block;
+    margin: auto auto 1em auto;
+    text-align: center;
+    text-decoration: none;
+    height: 2.5em;
+    line-height: 2.5em;
+    border-radius: .8em 0 .8em 0;
+    width: 80%;
+}
+
+#restaurants-list li a:hover {
+    color: #fff;
+}
+
+/* ====================== Restaurant Details ====================== */
+
+.inside header {
+}
+
+.inside #map-container {
+    background: #fff;
+    position: relative;
+    width: 100%;
+    min-width: 250px;
+    height: 400px;
+}
+
+.inside #map {
+    background: #ccc;
+    height: 100%;
+    width: 100%;
+}
+
+.inside #restaurant-hours {
+    background: #fff;
+    border-radius: 0 0 1em 0;
+    box-shadow: 0 1em 1em 0 rgba(0, 0, 0, 0.2);
+    border: none;
+    width: 100%;
+    padding: 1em;
+    text-align: center;
+}
+
+.inside #restaurant-address {
+    box-shadow: 0 1em 1em 0 rgba(0, 0, 0, 0.2);
+    background: #fff;
+    text-align: center;
+    margin: 0;
+    padding: 1em;
+}
+
+.inside #footer {
+
+}
+
+#restaurant-name,
+#reviews-container h2,
+#restaurants-list h3,
+.inside section h3 {
+    color: #111;
+    font-size: 1.5em;
+    text-align: center;
+}
+
+#restaurant-img {
+    margin-bottom: 1em;
+    width: 100%;
+    border-radius: 1em 1em 0 0;
+    box-shadow: 0 1em 1em 0 rgba(0, 0, 0, 0.2);
+    -moz-transition: all 0.3s;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+#restaurant-cuisine {
+    margin: 0 auto;
+    border-radius: 1em 0 0 0;
+    background: #333;
+    color: #fff;
+    font-size: 1.2em;
+    font-weight: 300;
+    letter-spacing: .4em;
+    padding: .7em 0;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+#restaurant-container, #reviews-container {
+    width: calc(100% - 1.5em);
+    margin: 1em auto;
+}
+
+#reviews-container {
+}
+
+#reviews-list {
+
+}
+
+#reviews-list li {
+    list-style-type: none;
+    background: #fff;
+    border-radius: 1em 0 1em 0;
+    box-shadow: 0 .8em .8em 0 rgba(0, 0, 0, 0.2);
+    -moz-transition: all 0.3s;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+    margin-bottom: 1.5em;
+}
+
+/* Tweaking restaurant reviews to look as in spec */
+#reviews-list li p {
+    padding: 1em;
+    text-align: justify;
+    font-style: italic;
+}
+
+/* Reviewer name */
+#reviews-list li p:nth-of-type(1) {
+    text-align: left;
+    width: calc(25% - 1em);
+    border-radius: 1em 0 0 0;
+    background: #333;
+    color: #fff;
+    float: left;
+    line-height: 3em;
+    margin: 0;
+    padding: 0 0 0 1em;
+    letter-spacing: .2em;
+    font-weight: bold;
+}
+
+/* Review date */
+#reviews-list li p:nth-of-type(2) {
+    text-align: right;
+    width: calc(75% - 1em);
+    font-style: italic;
+    color: #fff;
+    float: right;
+    background: #333;
+    line-height: 3em;
+    margin: 0;
+    padding: 0 1em 0 0;
+}
+
+/* Reviewe rating */
+#reviews-list li p:nth-of-type(3) {
+    color: #fff;
+    display: inline-block;
+    width: 10em;
+    background: #f18200;
+    border-radius: .4em;
+    box-shadow: 0 0.4em 0.4em 0 rgba(0, 0, 0, 0.2);
+    height: 1em;
+    margin: 1em 0 0 1em;
+    text-align: center;
+    font-style: normal;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+#Offline {
+    padding: 1em;
+}

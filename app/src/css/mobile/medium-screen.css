@@ -1,0 +1,28 @@
+nav h1 {
+    width: 100%;
+}
+
+nav h1 a {
+    font-size: 19px;
+}
+
+#Logo {
+    float: left;
+    display: inline-block;
+    height: 3em;
+    width: 50px;
+    margin: -.8em auto;
+    padding: 0;
+}
+
+#restaurants-list li h1 {
+    min-height: 70px
+}
+
+/* Restaurant details */
+@media screen and (min-width: 630px) {
+    #restaurant-container, #reviews-container {
+        width: calc(50% - 1.5em);
+        margin: 0 auto 2em;
+    }
+}
