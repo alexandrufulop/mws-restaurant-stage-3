@@ -25,7 +25,7 @@ printf "Checking if the container is already running...\n"
                 printf "Starting the docker $app container...\n"
 
                 ##this command includes npm install
-                docker run $OPT --name $app --restart=always -v $(pwd):/usr/src/app -ti -p 82:8000 -p 83:1337 $app
+                docker run $OPT --name $app --restart=always -v $(pwd):/usr/src/app -p 82:8000 -p 83:1337 node:latest
 
                 else
                         printf "Installing/Updating the npm packages...\n"

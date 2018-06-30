@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "autoprefixer": "^8.1.0",
+    "autoprefixer": "^8.6.4",
     "browserslist": "^3.2.8",
     "cssnano": "^3.10.0",
     "grunt": "^1.0.2",
