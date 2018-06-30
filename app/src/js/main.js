@@ -135,7 +135,8 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
     restaurants.forEach(restaurant => {
         ul.append(createRestaurantHTML(restaurant));
     });
-    addMarkersToMap();
+
+        addMarkersToMap();
 };
 
 /**
@@ -225,12 +226,14 @@ createRestaurantHTML = (restaurant) => {
  * Add markers for current restaurants to the map.
  */
 addMarkersToMap = (restaurants = self.restaurants) => {
-    restaurants.forEach(restaurant => {
-        // Add marker to the map
-        const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map);
+
+       restaurants.forEach(restaurant => {
+            // Add marker to the map
+            const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map);
             google.maps.event.addListener(marker, 'click', () => {
                 window.location.href = marker.url
             });
             self.markers.push(marker);
-    });
+        });
+
 };

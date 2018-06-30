@@ -104,8 +104,21 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
         fillRestaurantHoursHTML();
     }
 
-    // fill reviews
-    fillReviewsHTML();
+    //debug
+    //console.log(`Restaurant id is ${restaurant.id}`);
+
+    /* Retrieve reviews */
+    DBHelper.fetchRestaurantReviews(restaurant.id, (error, reviews) => {
+        self.restaurant.reviews = reviews;
+        if (!reviews) {
+            console.error(error);
+            return;
+        }
+
+        // fill reviews
+        fillReviewsHTML();
+    });
+
 };
 
 /**
@@ -169,6 +182,8 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
  * Create review HTML and add it to the webpage.
  */
 createReviewHTML = (review) => {
+    console.log(review);
+
     const li = document.createElement('li');
     const name = document.createElement('p');
     name.innerHTML = review.name;
@@ -179,6 +194,15 @@ createReviewHTML = (review) => {
      * Reviewer's name
      */
     name.setAttribute("aria-label", `Reviewer's name: ${review.name}.`);
+
+    /* Setting date from the json timestamp */
+    let restData = new Date(review.createdAt);
+    if(review.updatedAt !== undefined)
+    {
+        let restData = new Date(review.updatedAt);
+    }
+
+    review.date = restData.toDateString();
 
     const date = document.createElement('p');
     date.innerHTML = review.date;
