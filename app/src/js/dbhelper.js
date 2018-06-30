@@ -303,94 +303,32 @@ class DBHelper {
 
     static fetchRestaurantReviews(restaurantID,callback) {
 
-        //todo add the reviews object in the same database as restaurants, I could not achieve this yet
-        /* IndexDB */
-        let databaseName = 'data-v1';
-        let dbObject = 'reviews';
+        //there is no stored data so we retrieve it from the server
+        /* Getting the restaurants JSON from the development server using the FETCH API instead of XMLHttpRequest() */
+        fetch(DBHelper.DATABASE_URL+'/reviews/?restaurant_id='+restaurantID)
+            .then(
+                function(response) {
+                    if (response.status !== 200) {
+                        console.log('Error: Looks like there was a problem. Status Code: ' +
+                            response.status);
 
-        const dbPromise = idb.open(databaseName, 1, function(upgradeDb) {
+                        callback(response.status, null);
+                    }
 
-            //debug
-            //console.log(`Info: Opening the ${databaseName} object store.`); //debug
+                    //This is the JSON response from the dev server
+                    response.json().then(function(data) {
 
-            if (!upgradeDb.objectStoreNames.contains(dbObject)) {
-                upgradeDb.createObjectStore(dbObject,{
-                    keyPath: 'id'
-                });
+                       //console.log(data); //restaurants data from remote JSON //debug
+                        callback(null, data); //returning the data => restaurants JSON
 
-                //console.log('Creating a new data object store for restaurants JSON.'); //debug
-            }
-        }).catch(function(){
-            console.log('Info: Database is not available');
-        });
-
-
-        /* Get stored objects */
-        dbPromise.then(db => {
-            return db.transaction(dbObject)
-                .objectStore(dbObject).getAll();
-        }).then(function(storedData) {
-
-            //if we have stored JSON data in the indexDB
-            if (storedData.length > 0) {
-
-                //debug
-                //console.log('Info: We have stored data in our ibd', storedData);
-
-                callback(null, storedData); //we are returning the stored data from the idb
-            }
-            else
-            {
-
-                console.log('Info: Retriving JSON data and storing into DB');
-
-
-                //there is no stored data so we retrieve it from the server
-                /* Getting the restaurants JSON from the development server using the FETCH API instead of XMLHttpRequest() */
-                fetch(DBHelper.DATABASE_URL+'/reviews/?restaurant_id='+restaurantID)
-                    .then(
-                        function(response) {
-                            if (response.status !== 200) {
-                                console.log('Error: Looks like there was a problem. Status Code: ' +
-                                    response.status);
-
-                                callback(response.status, null);
-                            }
-
-                            //This is the JSON response from the dev server
-                            response.json().then(function(data) {
-
-                                //console.log(data); //restaurants data from remote JSON //debug
-
-                                dbPromise.then(function(db) {
-                                    let tx = db.transaction(dbObject, 'readwrite');
-                                    let keyValStore = tx.objectStore(dbObject);
-
-                                    data.forEach(function(restaurant){
-                                        keyValStore.put(restaurant);
-                                    });
-
-                                    //return tx.complete;
-                                }).then(function() {
-                                    //console.log('Success: JSON data added to indexDB!'); //debug
-                                }).catch(function(err){
-                                    console.log('Error: could not add data to indexDB!'); //debug
-                                });
-
-                                callback(null, data); //returning the data => restaurants JSON
-
-                            });
-                        }
-                    )
-                    .catch(function(err) {
-                        console.log('Error: Fetch Error', err);
-
-                        callback(err, null);
                     });
-            }
+                }
+            )
+            .catch(function(err) {
+                console.log('Error: Fetch Error', err);
 
-        });
-
+                callback(err, null);
+            });
     }
 
 }

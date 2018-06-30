@@ -14,7 +14,7 @@
  * Service Worker actions
  */
 
-let cacheName = 'gglnd-stage2-v0';
+let cacheName = 'gglnd-stage3-v0';
 
 let urlsToCache = [
     '/',
@@ -30,7 +30,7 @@ let urlsToCache = [
     '/dist/libs.js',
     '/dist/main.js',
     '/dist/restaurant_info.js',
-    '/restaurant.html',
+    //'/restaurant.html', //todo remove before submitting the project
     'http://localhost:1337/restaurants' //caching json request
 ];
 

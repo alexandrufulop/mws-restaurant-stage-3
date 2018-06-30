@@ -117,6 +117,75 @@
     Copyright (c) 2018 <a href="/" title="Homepage"><strong>Restaurant Reviews</strong></a> All Rights Reserved.
 </footer>
 <!-- End footer -->
+<!-- Modal for adding review -->
+<div class="is-hidden modal-overlay">
+    <div class="modal">
+        <div class="modal-content">
+            <form class="form-container" id="ModalForm">
+                <!-- this form can be generated from JS //-->
+                <div class="form-title"><h2>Add a review</h2></div>
+                <div class="form-title">Your name</div>
+                <input class="form-field" type="text" name="name" required maxlength="255" placeholder="Please enter your name..." /><br />
+                <div class="form-title">Rate this restaurant</div>
+                <div class="rating">
+                    <label>
+                        <input type="radio" name="stars" value="1" />
+                        <span class="icon">★</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="stars" value="2" />
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="stars" value="3" />
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="stars" value="4" />
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="stars" value="5" required />
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                    </label>
+                </div>
+                <input name="rating" id="Rating" hidden>
+                <div class="form-title">Comments</div>
+                <textarea name="comments" cols="40" rows="10" required maxlength="255" placeholder="Please enter your comments..."></textarea>
+                <div class="submit-container">
+                    <input class="submit-button" type="reset" value="Cancel" onclick="closeModal()"/>
+                    <input class="submit-button" type="submit" value="Submit review" />
+                </div>
+                <!-- //end form content //-->
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    /* Setting the rating on the fly by selecting stars */
+    (function()
+    {
+        let radioButtons = document.getElementsByName("stars");
+
+        for ( let i = 0; radioButtons[ i ]; i++ )
+            radioButtons[ i ].onchange = f;
+
+        function f()
+        {
+            document.getElementById('Rating').setAttribute('value',this.value);
+        }
+    })()
+</script>
 <!-- Beginning scripts -->
 <script src="/dist/libs.js"></script> <!-- JS scripts in one // run grunt! -->
 <script src="/dist/main.js"></script> <!-- JS scripts in one // run grunt! -->

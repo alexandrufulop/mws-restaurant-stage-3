@@ -157,6 +157,12 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
 
     const title = document.createElement('h3');
     title.innerHTML = 'Reviews';
+
+    /* New feature: Adding a new review */
+    title.appendChild(openReviewForm(self.restaurant.id));
+
+    //WIP -> Issue passing the restaurant id further...
+
     /**
      * a11y
      * Allow tabbing to the Reviews section
@@ -172,17 +178,78 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
         return;
     }
     const ul = document.getElementById('reviews-list');
+
     reviews.forEach(review => {
         ul.appendChild(createReviewHTML(review));
     });
     container.appendChild(ul);
+
 };
 
+
+/* Open the add new review HTML form */
+openReviewForm = (restaurant_id) => {
+
+    let header = document.createElement('h4');
+    let button = document.createElement('button');
+    button.textContent = "Add a review";
+    button.setAttribute('class', 'submit-button');
+    button.onclick = function(restaurant_id){
+        //we watch the form for submission
+        document.getElementById('ModalForm').addEventListener('submit', function(event, restaurant_id) {
+            console.log(restaurant_id);
+            event.preventDefault();
+            submitReview(event, restaurant_id);
+        }); //ataching onsubmit event
+
+        openModal(); //opening the modal form
+    };
+
+    header.appendChild(button);
+
+    return header;
+};
+
+/* Submit the newly added review */
+submitReview = (event, restaurant_id) => {
+
+    alert(restaurant_id);
+    console.log(event, restaurant_id);
+    debugger;
+    let url = DBHelper.DATABASE_URL + '/reviews/';
+
+    let object = {};
+    form.forEach(function(value, key){
+        object[key] = value;
+    });
+    let jsonFormData = JSON.stringify(object);
+
+    fetch(url, {
+        method: 'post',
+        body: jsonFormData
+    }).then(function(response) {
+        return response.json();
+    }).then(function(data) {
+
+        //debug response
+        console.log(data);
+        //Success code goes here
+        alert('Thank you for your review');
+    }).catch(function(err) {
+        //debug
+        console.log(err);
+        alert('Submit error...');
+    });
+
+
+};
 /**
  * Create review HTML and add it to the webpage.
  */
 createReviewHTML = (review) => {
-    console.log(review);
+
+    //debug reviews data
+  //console.log(review);
 
     const li = document.createElement('li');
     const name = document.createElement('p');
