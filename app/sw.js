@@ -25,12 +25,9 @@ let urlsToCache = [
     '/index.html',
     '/fonts/raleway-v12-latin-regular.woff2',
     '/dist/styles.min.css',
-    '/dist/large-screen.css',
-    '/dist/medium-screen.css',
-    '/dist/libs.js',
-    '/dist/main.js',
-    '/dist/restaurant_info.js',
-    //'/restaurant.html', //todo remove before submitting the project
+    '/dist/min.js',
+    '/dist/min-rest.js',
+    '/restaurant.html',
     'http://localhost:1337/restaurants' //caching json request
 ];
 

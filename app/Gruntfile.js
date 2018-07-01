@@ -14,10 +14,25 @@ module.exports = function(grunt) {
               separator: ';',
               sourceMap: false
           },
-          dist: {
-              src: ['node_modules/idb/lib/idb.js','src/js/dbhelper.js', 'src/js/modal.js'],
-              dest: 'dist/libs.js',
+          index: {
+              src: ['node_modules/idb/lib/idb.js', 'src/js/dbhelper.js', 'src/js/main.js'],
+              dest: 'dist/index.js',
           },
+          rest: {
+              src: ['node_modules/idb/lib/idb.js', 'src/js/dbhelper.js', 'src/js/main.js', 'src/js/modal.js', 'src/js/restaurant_info.js'],
+              dest: 'dist/rest.js',
+          },
+      },
+      uglify: {
+          options: {
+              mangle: false
+          },
+          my_target: {
+              files: {
+                  'dist/min.js': 'dist/index.js',
+                  'dist/min-rest.js': 'dist/rest.js'
+              }
+          }
       },
       postcss: {
         options: {
@@ -29,7 +44,7 @@ module.exports = function(grunt) {
           ]
         },
         dist: {
-          src: 'src/css/*.css', //we pack all our css except the - screen css in one file
+          src: 'src/css/**/*.css', //we pack all our css except the - screen css in one file
           dest: 'dist/styles.min.css'
         }
     },
@@ -56,6 +71,19 @@ module.exports = function(grunt) {
         }]
       }
     },
+      cwebp: {
+          dynamic: {
+              options: {
+                  q: 50
+              },
+              files: [{
+                  expand: true,
+                  cwd: 'img/',
+                  src: ['**/*.{png,jpg,gif}'],
+                  dest: 'img/'
+              }]
+          }
+      },
 
     /* Clear out the images directory if it exists */
     clean: {
@@ -83,12 +111,6 @@ module.exports = function(grunt) {
           flatten: true
         },
         {
-            expand: true,
-            cwd: 'src/css/mobile/',
-            src: ['*.css'],
-            dest: 'dist/',
-        }
-        ,{
             src: ['src/js/restaurant_info.js'],
             dest: 'dist/restaurant_info.js'
         },
@@ -104,8 +126,8 @@ module.exports = function(grunt) {
               tasks: ['jshint:gruntfile'],
           },
           src: {
-              files: ['src/js/*.js', 'src/css/**/*.css', '!lib/dontwatch.js'],
-              tasks: ['concat','copy']
+              files: ['src/js/*.js', 'src/css/**/**/*.css', '!lib/dontwatch.js'],
+              tasks: ['concat','uglify','copy']
           },
           options: {
               dateFormat: function(time) {
@@ -125,6 +147,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-mkdir');
-  grunt.registerTask('default', ['clean', 'postcss', 'copy', 'concat' , 'mkdir', 'responsive_images', 'watch']);
+  grunt.loadNpmTasks('grunt-cwebp');
+  grunt.loadNpmTasks('grunt-contrib-uglify-es');
+  grunt.registerTask('default', ['clean', 'postcss', 'copy', 'concat', 'uglify' , 'mkdir', 'responsive_images','cwebp', 'watch']);
 
 };

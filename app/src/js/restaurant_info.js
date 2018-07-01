@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 /**
  * Get current restaurant from page URL.
  */
-fetchRestaurantFromURL = (callback) => {
+const fetchRestaurantFromURL = (callback) => {
     if (self.restaurant) { // restaurant already fetched!
         callback(null, self.restaurant);
     }
@@ -61,7 +61,7 @@ fetchRestaurantFromURL = (callback) => {
 /**
  * Create restaurant HTML and add it to the webpage
  */
-fillRestaurantHTML = (restaurant = self.restaurant) => {
+let fillRestaurantHTML = (restaurant = self.restaurant) => {
 
     const name = document.getElementById('restaurant-name');
     name.innerHTML = restaurant.name;
@@ -124,7 +124,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 /**
  * Create restaurant operating hours HTML table and add it to the webpage.
  */
-fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => {
+let fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => {
     const hours = document.getElementById('restaurant-hours');
 
     for (let key in operatingHours) {
@@ -151,7 +151,7 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+let fillReviewsHTML = (reviews = self.restaurant.reviews) => {
 
     const container = document.getElementById('reviews-container');
 
@@ -159,9 +159,7 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
     title.innerHTML = 'Reviews';
 
     /* New feature: Adding a new review */
-    title.appendChild(openReviewForm(self.restaurant.id));
-
-    //WIP -> Issue passing the restaurant id further...
+    title.appendChild(htmlReviewForm());
 
     /**
      * a11y
@@ -188,19 +186,20 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
 
 
 /* Open the add new review HTML form */
-openReviewForm = (restaurant_id) => {
+let htmlReviewForm = () => {
 
     let header = document.createElement('h4');
     let button = document.createElement('button');
     button.textContent = "Add a review";
     button.setAttribute('class', 'submit-button');
-    button.onclick = function(restaurant_id){
+    button.onclick = function(){
         //we watch the form for submission
-        document.getElementById('ModalForm').addEventListener('submit', function(event, restaurant_id) {
-            console.log(restaurant_id);
+        document.getElementById('ModalForm').addEventListener('submit', function(event) {
             event.preventDefault();
-            submitReview(event, restaurant_id);
-        }); //ataching onsubmit event
+
+            //when the form will be submited we trigger this method
+            submitReview(event);
+        });
 
         openModal(); //opening the modal form
     };
@@ -210,32 +209,51 @@ openReviewForm = (restaurant_id) => {
     return header;
 };
 
-/* Submit the newly added review */
-submitReview = (event, restaurant_id) => {
+/* Submit the form with the newly added review */
+let submitReview = (event) => {
 
-    alert(restaurant_id);
-    console.log(event, restaurant_id);
-    debugger;
-    let url = DBHelper.DATABASE_URL + '/reviews/';
+    //debug
+    //console.log(event);
+    let url = DBHelper.DATABASE_URL + '/reviews/'; //backend server url
+    let jsonFormData = toJSONString(event.target); //the form data as a JSON obj
+    let jsonData = JSON.parse(jsonFormData);
+    jsonData["restaurant_id"] = self.restaurant.id; //setting the restaurant_id !!!
+    jsonFormData = JSON.stringify(jsonData); //rebuilding the json string
 
-    let object = {};
-    form.forEach(function(value, key){
-        object[key] = value;
-    });
-    let jsonFormData = JSON.stringify(object);
+    //debug
+    //console.log(jsonData,jsonFormData);
+    //debugger;
 
+    /* Post form data to the server using fetch api */
     fetch(url, {
         method: 'post',
         body: jsonFormData
     }).then(function(response) {
         return response.json();
     }).then(function(data) {
+        //successful: added the review to the db
+        let formEl = event.target.parentElement; //the div in which the form resides
+        let theForm = document.getElementById('ModalForm'); //to be improved: ideally should be selected using formEl ...
+        //console.log(data); //debug response
+        /* Crafting a nice message after form submit */
+        formEl.parentElement.style = 'background-color:#fff;z-index:9999;';
+        theForm.classList.add('is-hidden');
+        document.getElementById('ThankYou').classList.remove('is-hidden');
 
-        //debug response
-        console.log(data);
-        //Success code goes here
-        alert('Thank you for your review');
+        setTimeout(function(){
+           closeModal();
+            formEl.parentElement.style = '';
+            document.getElementById('ThankYou').classList.add('is-hidden');
+            theForm.classList.remove('is-hidden');
+        },3000); //closing modal after thank you message
+
+        //console.log(formEl);
+        //debugger;
+
     }).catch(function(err) {
+        //OFFLINE
+        /* If we could not send the request to the server we store the data in idb */
+
         //debug
         console.log(err);
         alert('Submit error...');
@@ -246,7 +264,7 @@ submitReview = (event, restaurant_id) => {
 /**
  * Create review HTML and add it to the webpage.
  */
-createReviewHTML = (review) => {
+let createReviewHTML = (review) => {
 
     //debug reviews data
   //console.log(review);
@@ -313,7 +331,7 @@ createReviewHTML = (review) => {
 /**
  * Add restaurant name to the breadcrumb navigation menu
  */
-fillBreadcrumb = (restaurant = self.restaurant) => {
+let fillBreadcrumb = (restaurant = self.restaurant) => {
     const breadcrumb = document.getElementById('breadcrumb');
 
     const li = document.createElement('li');
@@ -341,7 +359,7 @@ fillBreadcrumb = (restaurant = self.restaurant) => {
 /**
  * Get a parameter by name from page URL.
  */
-getParameterByName = (name, url) => {
+let getParameterByName = (name, url) => {
     if (!url)
         url = window.location.href;
     name = name.replace(/[\[\]]/g, '\\$&');
@@ -355,3 +373,19 @@ getParameterByName = (name, url) => {
 };
 
 
+/* Form to JSON - a method to convert the form input into a json object */
+let toJSONString = ( form ) => {
+    let obj = {};
+    let elements = form.querySelectorAll( "input, select, textarea" );
+    for( let i = 0; i < elements.length; ++i ) {
+        let element = elements[i];
+        let name = element.name;
+        let value = element.value;
+
+        if( name ) {
+            obj[ name ] = value;
+        }
+    }
+
+    return JSON.stringify( obj );
+};

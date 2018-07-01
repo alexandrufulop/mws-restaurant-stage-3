@@ -256,11 +256,11 @@ class DBHelper {
         we check to see if we have an image id available...
          */
         if (restaurant.photograph !== undefined) {
-            return (`/img/${restaurant.photograph}.jpg`);
+            return (`/img/${restaurant.photograph}.webp`); //for stage3 we will use webp
         }
 
         /* In case we do not have an image we could either return null or a dummy photo */
-        return ('/img/no-photo.png');
+        return ('/img/no-photo.webp');
     }
 
     /**
