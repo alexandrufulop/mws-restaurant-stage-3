@@ -16,14 +16,27 @@ class DBHelper {
 
         //registering the sw
         window.addEventListener('load', function () {
-            navigator.serviceWorker.register('/sw.js').then(function (registration) {
-                // Registration successful
-                //console.log('ServiceWorker registration successful with scope: ', registration.scope); //debug
-            }, function (err) {
-                // registration failed
-                console.log('ServiceWorker registration failed: ', err);
-            });
-        });
+
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => navigator.serviceWorker.ready)
+                .catch(function (err) {
+                    // registration failed
+                    console.log('ServiceWorker registration failed: ', err);
+                })
+                .then(registration => {
+                    let el = document.getElementById('ModalForm');
+
+                    if(el !== undefined && el !== null)
+                    {
+                        // register sync
+                        el.addEventListener('submit', function(event) {
+                            registration.sync.register('new-review').then(() => {
+                                console.log('Sync registered');
+                            });
+                        });
+                    }
+                }); //end then registration
+        }); //end register sw
 
     };
 
@@ -125,7 +138,7 @@ class DBHelper {
 
                             callback(err, null);
                         });
-                }
+                    }
 
         });
 

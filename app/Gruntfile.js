@@ -44,7 +44,7 @@ module.exports = function(grunt) {
           ]
         },
         dist: {
-          src: 'src/css/**/*.css', //we pack all our css except the - screen css in one file
+          src: 'src/css/*.css', //we pack all our css in one file
           dest: 'dist/styles.min.css'
         }
     },
@@ -117,6 +117,12 @@ module.exports = function(grunt) {
         {
             src: ['src/js/main.js'],
             dest: 'dist/main.js'
+        },
+        {
+            expand: true,
+            cwd: 'src/css/mobile/',
+            src: ['*.css'],
+            dest: 'dist/',
         }]
       }
     },
@@ -126,7 +132,7 @@ module.exports = function(grunt) {
               tasks: ['jshint:gruntfile'],
           },
           src: {
-              files: ['src/js/*.js', 'src/css/**/**/*.css', '!lib/dontwatch.js'],
+              files: ['src/js/*.js', 'src/css/*.css', '!lib/dontwatch.js'],
               tasks: ['concat','uglify','copy']
           },
           options: {

@@ -28,7 +28,8 @@ let urlsToCache = [
     '/dist/min.js',
     '/dist/min-rest.js',
     '/restaurant.html',
-    'http://localhost:1337/restaurants' //caching json request
+    'http://localhost:1337/restaurants', //caching json request,
+    'http://localhost:1337/reviews'
 ];
 
 
@@ -87,5 +88,11 @@ self.addEventListener('fetch', function (event) {
     );
 });
 
+self.addEventListener('sync', function (event) {
+    if (event.tag === 'new-review') {
+        //when the form will be submited we trigger this method
+        event.waitUntil(console.log('Syncing: event')); //todo wip
+    }
+});
 
 

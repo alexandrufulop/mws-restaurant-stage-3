@@ -238,3 +238,21 @@ let addMarkersToMap = (restaurants = self.restaurants) => {
         });
 };
 
+// Connection status banner
+let conStatus = () => {
+    let connectionStatus = document.getElementById('Status');
+
+    if (navigator.onLine) {
+        connectionStatus.style.display = 'none';
+        //connectionStatus.innerHTML = 'You are currently online!';
+        //connectionStatus.style.backgroundColor = '#2196F3'; //blue
+    } else {
+        connectionStatus.style.display = 'block';
+        connectionStatus.innerHTML = 'You are currently offline. Queued requests will be synced as soon as you are connected again.';
+        connectionStatus.style.backgroundColor = '#f44336'; //red
+    }
+};
+
+window.addEventListener('online', conStatus);
+window.addEventListener('offline', conStatus);
+conStatus();

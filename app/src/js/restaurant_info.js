@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
             fillBreadcrumb();
             DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
+            checkFavRestaurant(); //show favourite restaurant
         }
     });
 });
@@ -218,10 +219,11 @@ let submitReview = (event) => {
     let jsonFormData = toJSONString(event.target); //the form data as a JSON obj
     let jsonData = JSON.parse(jsonFormData);
     jsonData["restaurant_id"] = self.restaurant.id; //setting the restaurant_id !!!
+    jsonData["createdAt"] = Date.now();
     jsonFormData = JSON.stringify(jsonData); //rebuilding the json string
 
     //debug
-    //console.log(jsonData,jsonFormData);
+    console.log(jsonData,jsonFormData);
     //debugger;
 
     /* Post form data to the server using fetch api */
@@ -245,18 +247,30 @@ let submitReview = (event) => {
             formEl.parentElement.style = '';
             document.getElementById('ThankYou').classList.add('is-hidden');
             theForm.classList.remove('is-hidden');
+
+            //add review to the page no matter if request was successful or not
+            document.getElementById('reviews-list').appendChild(createReviewHTML(jsonData));
+
         },3000); //closing modal after thank you message
 
-        //console.log(formEl);
+        //console.log(data);
         //debugger;
 
     }).catch(function(err) {
-        //OFFLINE
-        /* If we could not send the request to the server we store the data in idb */
+        //OFFLINE: sync event should take over from here...
+        console.log(err); //debug
 
-        //debug
-        console.log(err);
-        alert('Submit error...');
+        setTimeout(function(){
+            closeModal();
+            formEl.parentElement.style = '';
+            document.getElementById('ThankYou').classList.add('is-hidden');
+            theForm.classList.remove('is-hidden');
+
+        },3000); //closing modal after thank you message
+
+        //Showing the user
+        let el = document.getElementById('Status');
+        el.scrollIntoView();
     });
 
 
@@ -388,4 +402,61 @@ let toJSONString = ( form ) => {
     }
 
     return JSON.stringify( obj );
+};
+
+/* Fav restaurant */
+
+/* Observe when user clicks on Favourite/Unfavorite */
+document.getElementById('Fav').addEventListener('click', function(event) {
+    event.preventDefault();
+
+    /* Toggle favourite star */
+    let path = document.getElementById('Fav').getElementsByTagName('path');
+    let starType = path[0].style.fill;
+    if(starType !== '')
+    {
+        path[0].style.fill = '';
+        favRestaurant('false');
+    }
+    else
+        {
+            path[0].style.fill = '#F05228'; //todo improve - set a class
+            favRestaurant('true');
+        }
+
+    console.log(starType);
+    //WIP set toggle post request
+});
+
+/* Favourite/Unfavorite a restaurant */
+//http://localhost:1337/restaurants/<restaurant_id>/?is_favorite=true
+let favRestaurant = (bool) => {
+
+    //set or unset Fav restaurant
+    return fetch(DBHelper.DATABASE_URL+'/restaurants/'+self.restaurant.id+'/?is_favorite='+bool,{method: 'PUT'})
+        .then(
+            function(response) {
+                if (response.status !== 200) {
+                    console.log('Error: Looks like there was a problem. Status Code: ' + response.status);
+                    //debug
+                    console.log('Success: Restaurant added to favourites!');
+                    //return false;
+                }
+
+                //return true; //fav restaurant ok
+            })
+        .catch(function(err) {
+            console.log('Error: Could not add restaurant to favourites', err);
+            //return false; //failed to fav
+        });
+};
+
+/* Check if favorite restaurant and show */
+let checkFavRestaurant = () => {
+    if(self.restaurant.is_favorite === 'true') {
+        let path = document.getElementById('Fav').getElementsByTagName('path');
+        let starType = path[0].style.fill;
+        path[0].style.fill = '#F05228'; //todo improve - set a class and reduce double code
+    }
+
 };
