@@ -18,32 +18,43 @@ let cacheName = 'gglnd-stage3-v0';
 
 let urlsToCache = [
     '/',
+    '/index.html',
+    '/restaurant.html',
+    '/dist/large-screen.css',
+    '/dist/medium-screen.css',
+    '/dist/styles.min.css',
+    '/dist/min-rest.js',
+    '/dist/min.js',
+    '/fonts',
+    '/img/1-800.webp',
+    '/img/2-800.webp',
+    '/img/3-800.webp',
+    '/img/4-800.webp',
+    '/img/5-800.webp',
+    '/img/6-800.webp',
+    '/img/7-800.webp',
+    '/img/8-800.webp',
+    '/img/9-800.webp',
+    '/img/no-photo-800.webp',
     '/icon.png',
     '/icon-min.png',
     '/favicon.ico',
     '/manifest.json',
-    '/index.html',
-    '/fonts/raleway-v12-latin-regular.woff2',
-    '/dist/styles.min.css',
-    '/dist/min.js',
-    '/dist/min-rest.js',
-    '/restaurant.html',
-    'http://localhost:1337/restaurants', //caching json request,
-    'http://localhost:1337/reviews'
+    'http://localhost:1337/restaurants'
 ];
 
-
+/* Cache specific uls - see above */
 self.addEventListener('install', function (event) {
     event.waitUntil(
         caches.open(cacheName).then(function (cache) {
             return cache.addAll(urlsToCache);
-        }).catch(function () {
-            console.log('Info: No cache storage available!');
+        }).catch(function (err) {
+            console.log('Info: No cache storage available yet!');
         })
     );
 });
 
-
+/* Observe any fetch event and cache it */
 self.addEventListener('fetch', function (event) {
     event.respondWith(
         //I need to match the cache for restaurants.html?id=
@@ -62,10 +73,15 @@ self.addEventListener('fetch', function (event) {
                 */
                 let fetchRequest = event.request.clone(); //!!CLONE
 
-                // console.log(fetchRequest); //debug //todo mode = 'no-cors'; for dummy image
+                 //debug
+                 //console.log('sw-fetch-request',fetchRequest); //debug
 
                 return fetch(fetchRequest).then(
                     function (response) {
+
+                        //debug
+                        //console.log('sw-fetch-response',response); //debug
+
                         // If we received a valid response from the network
                         if (!response || response.status !== 200 || response.type !== 'basic') {
                             return response;
@@ -73,26 +89,60 @@ self.addEventListener('fetch', function (event) {
 
                         //add all fetched assets to cache
                         let responseToCache = response.clone();
-
                         caches.open(cacheName)
                             .then(function (cache) {
                                 cache.put(event.request, responseToCache);
                             });
 
+
+
                         return response;
                     }
                 ).catch(function (err) {
-                    console.log('You are offline!');
+                    console.log('Info: You are offline!');
                 });
             })
     );
 });
 
+/* Background sync events handling */
 self.addEventListener('sync', function (event) {
+
+    /* Add new review to restaurant */
     if (event.tag === 'new-review') {
         //when the form will be submited we trigger this method
-        event.waitUntil(console.log('Syncing: event')); //todo wip
+        event.waitUntil(console.log(`Syncing: ${event.tag}`)); //todo wip
     }
+
+    /* Add/Remove resto from favourites */
+    if (event.tag === 'favourite') {
+        event.waitUntil(fav());
+    }
+
 });
+
+
+let fav = () => {
+    console.log('added to favorites');
+    //url from temp idb
+    //set or unset Fav restaurant
+    /*return fetch(url,{method: 'PUT'})
+        .then(
+            function(response) {
+                if (response.status !== 200) {
+                    console.log('Error: Looks like there was a problem. Status Code: ' + response.status);
+                    //debug
+                    console.log('Success: Restaurant added to favourites!');
+                    //return false;
+                }
+
+                //return true; //fav restaurant ok
+            })
+        .catch(function(err) {
+            console.log('Error: Could not add restaurant to favourites', err);
+            //return false; //failed to fav
+        });*/
+};
+
 
 

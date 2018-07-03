@@ -83,6 +83,17 @@ let fillRestaurantHTML = (restaurant = self.restaurant) => {
         const image = document.getElementById('restaurant-img');
         image.src = imageSrc;
         image.className = 'restaurant-img';
+        image.setAttribute('data-src', imageSrc);
+        image.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
+        /* Prevent bug in server json: There is a bug in the server side json -> last item is missing the photograph */
+        if (restaurant.photograph !== undefined) {
+            image.srcset = `/img/${restaurant.photograph}-400.webp 360w, /img/${restaurant.photograph}-800.webp 800w`;
+        }
+        else
+            {
+                image.srcset = `/img/no-photo-400.webp 360w, /img/no-photo-800.webp 800w`;
+            }
 
         //Adding dynamic alt text for each image
         const imageAlt = DBHelper.imageAltForRestaurant(restaurant);
@@ -108,12 +119,11 @@ let fillRestaurantHTML = (restaurant = self.restaurant) => {
     //debug
     //console.log(`Restaurant id is ${restaurant.id}`);
 
-    /* Retrieve reviews */
+    /* Retrieve current restaurant reviews */
     DBHelper.fetchRestaurantReviews(restaurant.id, (error, reviews) => {
         self.restaurant.reviews = reviews;
         if (!reviews) {
-            console.error(error);
-            return;
+            console.error(error); //could not retrieve reviews
         }
 
         // fill reviews
@@ -223,56 +233,62 @@ let submitReview = (event) => {
     jsonFormData = JSON.stringify(jsonData); //rebuilding the json string
 
     //debug
-    console.log(jsonData,jsonFormData);
+    //console.log(jsonData,jsonFormData);
     //debugger;
 
     /* Post form data to the server using fetch api */
-    fetch(url, {
+   return fetch(url, {
         method: 'post',
         body: jsonFormData
     }).then(function(response) {
         return response.json();
     }).then(function(data) {
-        //successful: added the review to the db
-        let formEl = event.target.parentElement; //the div in which the form resides
-        let theForm = document.getElementById('ModalForm'); //to be improved: ideally should be selected using formEl ...
+       //successful: added the review to the db
         //console.log(data); //debug response
-        /* Crafting a nice message after form submit */
-        formEl.parentElement.style = 'background-color:#fff;z-index:9999;';
-        theForm.classList.add('is-hidden');
-        document.getElementById('ThankYou').classList.remove('is-hidden');
+       thankYou(event);
 
-        setTimeout(function(){
-           closeModal();
-            formEl.parentElement.style = '';
-            document.getElementById('ThankYou').classList.add('is-hidden');
-            theForm.classList.remove('is-hidden');
-
-            //add review to the page no matter if request was successful or not
-            document.getElementById('reviews-list').appendChild(createReviewHTML(jsonData));
-
-        },3000); //closing modal after thank you message
-
-        //console.log(data);
-        //debugger;
+      //CAVEAT: todo Now we need to update the cached iDB info with the new, but being offline we don't know the review ID...
 
     }).catch(function(err) {
         //OFFLINE: sync event should take over from here...
-        console.log(err); //debug
+        //console.log(err); //debug
 
-        setTimeout(function(){
-            closeModal();
-            formEl.parentElement.style = '';
-            document.getElementById('ThankYou').classList.add('is-hidden');
-            theForm.classList.remove('is-hidden');
-
-        },3000); //closing modal after thank you message
+       //Show ThankYou!
+        thankYou(event);
 
         //Showing the user
         let el = document.getElementById('Status');
         el.scrollIntoView();
-    });
 
+    }).then(function(){
+       //add review to the page no matter if request was successful or not
+       let reviewsList = document.getElementById('reviews-list');
+       reviewsList.appendChild(createReviewHTML(jsonData));
+       reviewsList.scrollIntoView();
+   });
+
+
+
+};
+
+/* Show review Thank you and close modal */
+let thankYou = (event) => {
+
+    /* Locating our form... */
+    let formEl = event.target.parentElement; //the div in which the form resides
+    let theForm = document.getElementById('ModalForm'); //to be improved: ideally should be selected using formEl ...
+    /* Crafting a nice message after form submit */
+    formEl.parentElement.style = 'background-color:#fff;z-index:9999;';
+    theForm.classList.add('is-hidden');
+    document.getElementById('ThankYou').classList.remove('is-hidden');
+
+    setTimeout(function(){
+        closeModal();
+        formEl.parentElement.style = '';
+        document.getElementById('ThankYou').classList.add('is-hidden');
+        theForm.classList.remove('is-hidden');
+
+    },3000); //closing modal after thank you message
 
 };
 /**
@@ -405,51 +421,73 @@ let toJSONString = ( form ) => {
 };
 
 /* Fav restaurant */
+/* Favourite/Unfavorite a restaurant */
+/* Toggle favourite star */
+//http://localhost:1337/restaurants/<restaurant_id>/?is_favorite=true
+let addToFavorites = () => {
 
-/* Observe when user clicks on Favourite/Unfavorite */
-document.getElementById('Fav').addEventListener('click', function(event) {
-    event.preventDefault();
-
-    /* Toggle favourite star */
-    let path = document.getElementById('Fav').getElementsByTagName('path');
+    let Fav = document.getElementById('Fav');
+    let path = Fav.getElementsByTagName('path');
     let starType = path[0].style.fill;
+    let bool = 'false';
+
     if(starType !== '')
     {
         path[0].style.fill = '';
-        favRestaurant('false');
     }
     else
         {
             path[0].style.fill = '#F05228'; //todo improve - set a class
-            favRestaurant('true');
+            let bool = 'true';
         }
 
-    console.log(starType);
-    //WIP set toggle post request
-});
+   //write to iDB
 
-/* Favourite/Unfavorite a restaurant */
-//http://localhost:1337/restaurants/<restaurant_id>/?is_favorite=true
-let favRestaurant = (bool) => {
+    /* IndexDB */
+    let databaseName = 'temp';
+    let dbObject = 'favorites';
 
-    //set or unset Fav restaurant
-    return fetch(DBHelper.DATABASE_URL+'/restaurants/'+self.restaurant.id+'/?is_favorite='+bool,{method: 'PUT'})
-        .then(
-            function(response) {
-                if (response.status !== 200) {
-                    console.log('Error: Looks like there was a problem. Status Code: ' + response.status);
-                    //debug
-                    console.log('Success: Restaurant added to favourites!');
-                    //return false;
-                }
+    //we open/create a new iDB
+    const dbPromise = idb.open(databaseName, 1, function(upgradeDb) {
 
-                //return true; //fav restaurant ok
-            })
-        .catch(function(err) {
-            console.log('Error: Could not add restaurant to favourites', err);
-            //return false; //failed to fav
-        });
+        //debug
+        //console.log(`Info: Opening the ${databaseName} object store.`); //debug
+
+        if (!upgradeDb.objectStoreNames.contains(dbObject)) {
+            upgradeDb.createObjectStore(dbObject,{keyPath: 'id'});
+
+            //console.log('Creating a new data object store for restaurants JSON.'); //debug
+        }
+    }).catch(function(){
+        console.log('Info: Database is not available');
+    });
+
+
+    //we add the url to be fetched into the indexDB
+    dbPromise.then(function(db) {
+       //console.log(db, url);
+        let tx = db.transaction(dbObject, 'readwrite');
+
+        //AICI AM RAMAS -> WORK IN PROGRESS
+        tx.objectStore(dbObject).get(self.restaurant.id)
+            .then(obj => console.log('already stored', obj))
+            .catch(function(){
+                //add new url to temp idb in order to be processed
+                let url = DBHelper.DATABASE_URL+'/restaurants/'+self.restaurant.id+'/?is_favorite='+bool;
+                tx.objectStore(dbObject).put({
+                    id: self.restaurant.id,
+                    data: {url: url}
+                });
+            });
+
+    }).catch(function(err){
+        console.log(`Error: could not add ${url} data to indexDB!`); //debug
+    });
+
+
 };
+
+
 
 /* Check if favorite restaurant and show */
 let checkFavRestaurant = () => {

@@ -84,6 +84,9 @@
         <div id="map" role="application" tabindex="-1" aria-hidden="true">
             <span>Google map is not available offline</span></div>
     </section>
+    <!-- Connection Status -->
+    <div id="Status" class="alert"></div>
+    <!-- Restaurants -->
     <section role="region" id="FilterRestaurants">
         <div id="filterResults" class="filter-options" role="listbox" tabindex="0"
              aria-label="Filter restaurants by, neighborhood and cuisine">
@@ -104,9 +107,6 @@
 <footer id="footer">
     Copyright (c) 2018 <a href="/" title="Homepage"><strong>Restaurant Reviews</strong></a> All Rights Reserved.
 </footer>
-<div id="Status" class="alert">
-    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-</div>
 <script src="/dist/min.js"></script> <!-- JS scripts in one // run grunt! -->
 <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDz9jb0dWCRZg-4MhD9adsvD1uHKBb82_c&libraries=places&callback=initMap"></script>

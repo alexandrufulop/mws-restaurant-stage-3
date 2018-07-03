@@ -5,7 +5,7 @@
     font-weight: 400;
     font-display: auto;
     src: local('Raleway'), local('Raleway-Regular'),
-    url('/fonts/raleway-v12-latin-regular.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */ url('/fonts/raleway-v12-latin-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+    url('/fonts/Raleway-Regular.woff') format('woff')
 }
 
 body,
@@ -160,7 +160,7 @@ nav h1 a {
 
 /* Favourite Icon */
 .favourite{
-    margin: -620px 0 81px -11px;
+    margin: 50px 0 0 -10px;
     position: absolute;
 }
 
@@ -682,18 +682,21 @@ nav h1 a {
     text-shadow: 0 0 5px #fff;
 }
 
-/* The alert message box */
+/* Connection status  */
 .alert {
+    display: none;
     padding: 20px;
     background-color: #f44336; /* Red */
-    color: white;
+    color: #fff;
     margin-bottom: 15px;
+    width:100%;
+    text-align:center;
 }
 
 /* The close button */
 .closebtn {
     margin-left: 15px;
-    color: white;
+    color: #fff;
     font-weight: bold;
     float: right;
     font-size: 22px;
@@ -704,5 +707,5 @@ nav h1 a {
 
 /* When moving the mouse over the close button */
 .closebtn:hover {
-    color: black;
+    color: #000;
 }

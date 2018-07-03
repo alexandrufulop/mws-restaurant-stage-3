@@ -24,17 +24,35 @@ class DBHelper {
                     console.log('ServiceWorker registration failed: ', err);
                 })
                 .then(registration => {
-                    let el = document.getElementById('ModalForm');
 
-                    if(el !== undefined && el !== null)
+                    /* Observe Add new review form submit & add sync event */
+                    let ModalEl = document.getElementById('ModalForm');
+                    if(ModalEl !== undefined && ModalEl !== null)
                     {
-                        // register sync
-                        el.addEventListener('submit', function(event) {
+                        // register sync for add new review
+                        ModalEl.addEventListener('submit', function(event) {
                             registration.sync.register('new-review').then(() => {
-                                console.log('Sync registered');
+                                console.log('Sync registered for adding new restaurant review.');
                             });
                         });
                     }
+
+                    /* Observe when user clicks on Favourite/Unfavorite & add sync event */
+                    let Fav = document.getElementById('Fav');
+                    if(Fav !== undefined && Fav !== null){
+
+                        Fav.addEventListener('click', function(event) {
+                            event.preventDefault();
+                            addToFavorites(); //call add to favorites -> we write the request into a temp iDB
+                            //QUESTION: Why I can't send params/variables to the sync event from here?
+
+                            registration.sync.register('favourite').then(() => {
+                                console.log('Sync registered for adding new restaurant to favourites.');
+                            });
+
+                        });
+                    }
+
                 }); //end then registration
         }); //end register sw
 
@@ -93,8 +111,8 @@ class DBHelper {
             else
                 {
 
-                    console.log('Info: Retriving JSON data and storing into DB');
-
+                    //debug
+                    //console.log('Info: Retriving JSON data and storing into DB');
 
                     //there is no stored data so we retrieve it from the server
                     /* Getting the restaurants JSON from the development server using the FETCH API instead of XMLHttpRequest() */
@@ -316,32 +334,93 @@ class DBHelper {
 
     static fetchRestaurantReviews(restaurantID,callback) {
 
-        //there is no stored data so we retrieve it from the server
-        /* Getting the restaurants JSON from the development server using the FETCH API instead of XMLHttpRequest() */
-        fetch(DBHelper.DATABASE_URL+'/reviews/?restaurant_id='+restaurantID)
-            .then(
-                function(response) {
-                    if (response.status !== 200) {
-                        console.log('Error: Looks like there was a problem. Status Code: ' +
-                            response.status);
+        /* IndexDB */
+        let databaseName = 'data-v1'; //todo I need help here: I want to use the same iDB for both restaurants and reviews json data
+        let dbObject = 'reviews';
 
-                        callback(response.status, null);
-                    }
+        const dbPromise = idb.open(databaseName, 1, function(upgradeDb) {
 
-                    //This is the JSON response from the dev server
-                    response.json().then(function(data) {
+            //debug
+            //console.log(`Info: Opening the ${databaseName} object store.`); //debug
 
-                       //console.log(data); //restaurants data from remote JSON //debug
-                        callback(null, data); //returning the data => restaurants JSON
+            if (!upgradeDb.objectStoreNames.contains(dbObject)) {
+                upgradeDb.createObjectStore(dbObject,{
+                    keyPath: 'id'
+                });
 
+                //console.log('Creating a new data object store for restaurants JSON.'); //debug
+            }
+        }).catch(function(){
+            console.log('Info: iDB is not available');
+        });
+
+
+        /* Get stored objects */
+        dbPromise.then(db => {
+            return db.transaction(dbObject)
+                .objectStore(dbObject).getAll();
+        }).then(function(storedData) {
+
+            //if we have stored JSON data in the indexDB
+            if (storedData.length > 0) {
+
+                //debug
+                //console.log('Info: We have stored data in our ibd', storedData);
+
+                callback(null, storedData); //we are returning the stored data from the idb
+            }
+            else
+            {
+                //debug
+                //console.log('Info: Retriving reviews JSON data and storing into DB');
+
+                //there is no stored data so we retrieve it from the server
+
+                return fetch(DBHelper.DATABASE_URL+'/reviews/?restaurant_id='+restaurantID)
+                    .then(
+                        function(response) {
+                            if (response.status !== 200) {
+                                console.log('Error: Looks like there was a problem. Status Code: ' +
+                                    response.status);
+
+                                callback(response.status, null);
+                            }
+
+                            //This is the JSON response from the dev server
+                            response.json().then(function(data) {
+
+                                dbPromise.then(function(db) {
+                                    let tx = db.transaction(dbObject, 'readwrite');
+                                    let keyValStore = tx.objectStore(dbObject);
+
+                                    data.forEach(function(restaurant){
+                                        keyValStore.put(restaurant);
+                                    });
+
+                                    //return tx.complete;
+                                }).then(function() {
+                                    //debug
+                                    //console.log('Success: JSON data added to indexDB!'); //debug
+                                }).catch(function(err){
+                                    console.log('Error: could not add data to indexDB!'); //debug
+                                });
+
+                                //console.log(data); //restaurants data from remote JSON //debug
+
+                                callback(null, data); //returning the data => restaurants JSON
+
+                            });
+                        }
+                    )
+                    .catch(function(err) {
+                        console.log('Error: Fetch Error', err);
+
+                        callback(err, null);
                     });
-                }
-            )
-            .catch(function(err) {
-                console.log('Error: Fetch Error', err);
 
-                callback(err, null);
-            });
-    }
+            } //end else
+
+        });
+    } //end fetchRestaurantReviews() method
 
 }

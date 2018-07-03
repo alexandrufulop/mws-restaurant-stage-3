@@ -111,6 +111,18 @@ module.exports = function(grunt) {
           flatten: true
         },
         {
+            expand: true,
+            cwd: 'node_modules/roboto-fontface/fonts/roboto/',
+            src: ['*.woff', '*.woff2'],
+            dest: 'fonts/',
+        },
+        {
+            expand: true,
+            cwd: 'node_modules/raleway-npm-webfont/fonts/',
+            src: ['*.woff'],
+            dest: 'fonts/',
+        },
+        {
             src: ['src/js/restaurant_info.js'],
             dest: 'dist/restaurant_info.js'
         },

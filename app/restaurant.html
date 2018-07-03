@@ -96,16 +96,19 @@
             <span>Google map is not available offline</span></div>
     </section>
     <!-- End map -->
+    <!-- Connection Status -->
+    <div id="Status" class="alert"></div>
     <!-- Beginning restaurant -->
     <section id="restaurant-container" role="region" aria-label="Restaurant details">
-        <h2 id="restaurant-name" aria-roledescription="Restaurant name"></h2>
-        <img role="img" id="restaurant-img">
+        <!-- Favourite restaurant -->
         <div class="favourite"><svg id="Fav" width="70" height="70" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 426.668 426.668" style="enable-background:new 0 0 426.668 426.668;" xml:space="preserve">
 <path style="fill:#F05228;" d="M401.788,74.476c-63.492-82.432-188.446-33.792-188.446,49.92
 	c0-83.712-124.962-132.356-188.463-49.92c-65.63,85.222-0.943,234.509,188.459,320.265
 	C402.731,308.985,467.418,159.698,401.788,74.476z"/></svg>
-        </div>
+        </div><!-- End favourite restaurant -->
+        <h2 id="restaurant-name" aria-roledescription="Restaurant name"></h2>
+        <img role="img" id="restaurant-img">
         <p id="restaurant-cuisine" tabindex="0"></p>
         <p id="restaurant-address" tabindex="0"></p>
         <table id="restaurant-hours" tabindex="0" aria-label="Opening hours"></table>
@@ -122,9 +125,6 @@
 <footer id="footer">
     Copyright (c) 2018 <a href="/" title="Homepage"><strong>Restaurant Reviews</strong></a> All Rights Reserved.
 </footer>
-<div id="Status" class="alert">
-    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-</div>
 <!-- End footer -->
 <!-- Modal for adding review -->
 <div class="is-hidden modal-overlay">
