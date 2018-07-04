@@ -16,6 +16,7 @@ class DBHelper {
 
         //registering the sw
         window.addEventListener('load', function () {
+        //We need to make sure the DOM is ready so we can access our HTML elements...
 
             navigator.serviceWorker.register('/sw.js')
                 .then(registration => navigator.serviceWorker.ready)
@@ -43,9 +44,12 @@ class DBHelper {
 
                         Fav.addEventListener('click', function(event) {
                             event.preventDefault();
-                            addToFavorites(); //call add to favorites -> we write the request into a temp iDB
+
+                            //call add to favorites -> we write the request into a temp iDB
+                            addToFavorites();
                             //QUESTION: Why I can't send params/variables to the sync event from here?
 
+                            //register sync event
                             registration.sync.register('favourite').then(() => {
                                 console.log('Sync registered for adding new restaurant to favourites.');
                             });

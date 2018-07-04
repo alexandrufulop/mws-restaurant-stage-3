@@ -426,23 +426,6 @@ let toJSONString = ( form ) => {
 //http://localhost:1337/restaurants/<restaurant_id>/?is_favorite=true
 let addToFavorites = () => {
 
-    let Fav = document.getElementById('Fav');
-    let path = Fav.getElementsByTagName('path');
-    let starType = path[0].style.fill;
-    let bool = 'false';
-
-    if(starType !== '')
-    {
-        path[0].style.fill = '';
-    }
-    else
-        {
-            path[0].style.fill = '#F05228'; //todo improve - set a class
-            let bool = 'true';
-        }
-
-   //write to iDB
-
     /* IndexDB */
     let databaseName = 'temp';
     let dbObject = 'favorites';
@@ -463,38 +446,115 @@ let addToFavorites = () => {
     });
 
 
-    //we add the url to be fetched into the indexDB
     dbPromise.then(function(db) {
        //console.log(db, url);
         let tx = db.transaction(dbObject, 'readwrite');
 
-        //AICI AM RAMAS -> WORK IN PROGRESS
+        //we check to see if we already registered this pending request
+        //if so this means the user changes his mind and unfavorite the resto
         tx.objectStore(dbObject).get(self.restaurant.id)
-            .then(obj => console.log('already stored', obj))
-            .catch(function(){
-                //add new url to temp idb in order to be processed
-                let url = DBHelper.DATABASE_URL+'/restaurants/'+self.restaurant.id+'/?is_favorite='+bool;
+            .then(function(obj){
+
+                //do we have stored pending data?
+                if(obj !== undefined)
+                {
+                    let storedUrl = new URL(obj.data.url); //create a url object from stored url string
+                    let favourite = storedUrl.searchParams.get("is_favorite"); //the current favourite state
+
+                    //if the user changes his mind and unfavorite while offline we keep track of that action... //BROBLEM
+                    if(favourite === "false") {
+                        self.restaurant.is_favorite = "true";
+                    }
+                    else {
+                        self.restaurant.is_favorite = "false";
+                    }
+
+                    console.log('Already stored object with favourite :', obj, self.restaurant.is_favorite);
+                }
+                else
+                    {
+                        //if the resto is not favourite, now will be and the opposite
+                        if(self.restaurant.is_favorite === "false") {
+                            self.restaurant.is_favorite = "true";
+                        }
+                        else {
+                            self.restaurant.is_favorite = "false";
+                        }
+                    }
+
+                //add url or modify url to temp idb in order to be processed
+                let url = DBHelper.DATABASE_URL+'/restaurants/'+self.restaurant.id+'/?is_favorite='+self.restaurant.is_favorite;
                 tx.objectStore(dbObject).put({
                     id: self.restaurant.id,
                     data: {url: url}
+                }).then(function(){
+
+                    //Modify this restaurant stored data to reflect the favourite change.. Otherwise the cached version will be old
+                    /* IndexDB */
+                    let databaseNameR = 'data-v0';
+                    let dbObjectR = 'restaurants';
+
+                    let dbPromiseR = idb.open(databaseNameR, 1).catch(console.log('Info: Database is not available'));
+
+                    dbPromiseR.then(function (dbR) {
+                        //debug
+                        //console.log(dbR);
+
+                        //console.log(self.restaurant);
+                       //We update this restaurant favourite value in the restaurants idb
+                        let txR = dbR.transaction(dbObjectR, 'readwrite') //READWRITE VERY IMPORTANT for add, put, or delete methods
+                            .objectStore(dbObjectR).put(self.restaurant);
+                        console.log(txR);
+                        return txR.complete;
+
+                    });
+
                 });
+
+
+            }).then(favToggle())
+            .catch(function(err){
+                console.log('Transaction failed', err);
             });
 
     }).catch(function(err){
         console.log(`Error: could not add ${url} data to indexDB!`); //debug
     });
 
-
 };
 
+/* Toggle favourite heart on/off */
+let favToggle = () => {
 
+    //if we don't have any stored pending favourite requests we get the current state from the icon
+    let Fav = document.getElementById('Fav');
+    let path = Fav.getElementsByTagName('path');
+    let starType = path[0].style.fill;
+
+    if(starType !== '')
+    {
+        path[0].style.fill = '';
+    }
+    else
+        {
+            path[0].style.fill = '#F05228'; //todo improve - set a class
+        }
+};
 
 /* Check if favorite restaurant and show */
 let checkFavRestaurant = () => {
-    if(self.restaurant.is_favorite === 'true') {
-        let path = document.getElementById('Fav').getElementsByTagName('path');
-        let starType = path[0].style.fill;
-        path[0].style.fill = '#F05228'; //todo improve - set a class and reduce double code
+
+    console.log('Check favourite:',self.restaurant.is_favorite);
+
+    let path = document.getElementById('Fav').getElementsByTagName('path');
+    let starType = path[0].style.fill;
+
+    if(self.restaurant.is_favorite === "false") {
+        path[0].style.fill = ''; //todo improve - set a class and reduce double code
     }
+    else
+        {
+            path[0].style.fill = '#F05228'; //todo improve - set a class and reduce double code
+        }
 
 };
