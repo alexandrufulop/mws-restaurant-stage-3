@@ -14,51 +14,56 @@ class DBHelper {
             return;
         }
 
-        //registering the sw
-        window.addEventListener('load', function () {
-        //We need to make sure the DOM is ready so we can access our HTML elements...
 
-            navigator.serviceWorker.register('/sw.js')
-                .then(registration => navigator.serviceWorker.ready)
-                .catch(function (err) {
-                    // registration failed
-                    console.log('ServiceWorker registration failed: ', err);
-                })
-                .then(registration => {
+        window.addEventListener('load', function(event) {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
 
-                    /* Observe Add new review form submit & add sync event */
-                    let ModalEl = document.getElementById('ModalForm');
-                    if(ModalEl !== undefined && ModalEl !== null)
+                    //navigator.serviceWorker.ready = registration;??
+
+                    if ('sync' in registration)
                     {
-                        // register sync for add new review
-                        ModalEl.addEventListener('submit', function(event) {
-                            registration.sync.register('new-review').then(() => {
-                                console.log('Sync registered for adding new restaurant review.');
+                        /* Observe Add new review form submit & add sync event
+                        let ModalEl = document.getElementById('ModalForm');
+                        if(ModalEl !== undefined && ModalEl !== null)
+                        {
+                            // register sync for add new review
+                            ModalEl.addEventListener('submit', function(event) {
+                                //event.preventDefault();
+                                registration.sync.register('new-review').then(() => {
+                                    console.log('Sync registered for adding new restaurant review.');
+                                });
                             });
-                        });
-                    }
+                        }*/
 
-                    /* Observe when user clicks on Favourite/Unfavorite & add sync event */
-                    let Fav = document.getElementById('Fav');
-                    if(Fav !== undefined && Fav !== null){
+                        /* Observe when user clicks on Favourite/Unfavorite & add sync event */
+                        let Fav = document.getElementById('Fav');
+                        if(Fav !== undefined && Fav !== null){
 
-                        Fav.addEventListener('click', function(event) {
-                            event.preventDefault();
+                            Fav.addEventListener('click', function(event) {
+                                event.preventDefault();
 
-                            //call add to favorites -> we write the request into a temp iDB
-                            addToFavorites();
-                            //QUESTION: Why I can't send params/variables to the sync event from here?
+                                alert('ok');
 
-                            //register sync event
-                            registration.sync.register('favourite').then(() => {
-                                console.log('Sync registered for adding new restaurant to favourites.');
+                                //call add to favorites -> we write the request into a temp iDB
+                                addToFavorites();
+                                //QUESTION: Why I can't send params/variables to the sync event from here?
+
+                                //register sync event
+                                registration.sync.register('favourite').then(() => {
+                                    console.log('Sync registered for adding new restaurant to favourites.');
+                                });
+
                             });
+                        }
 
-                        });
-                    }
+                    } //end if sync is avaliable
+                }).catch(function(err) {
+                    console.error('ServiceWorker registration failed: ', err); // the Service Worker didn't install correctly
+                });
+            }
+        });
 
-                }); //end then registration
-        }); //end register sw
 
     };
 

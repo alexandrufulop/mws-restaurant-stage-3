@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         } else {
 
             //console.log(restaurant); //restaurant data from parsed json
-
             fillBreadcrumb();
             DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
             checkFavRestaurant(); //show favourite restaurant
@@ -421,8 +420,7 @@ let toJSONString = ( form ) => {
 };
 
 /* Fav restaurant */
-/* Favourite/Unfavorite a restaurant */
-/* Toggle favourite star */
+/* Adds the (un)favourite request to iDB to be processed by the sw */
 //http://localhost:1337/restaurants/<restaurant_id>/?is_favorite=true
 let addToFavorites = () => {
 
@@ -547,7 +545,6 @@ let checkFavRestaurant = () => {
     console.log('Check favourite:',self.restaurant.is_favorite);
 
     let path = document.getElementById('Fav').getElementsByTagName('path');
-    let starType = path[0].style.fill;
 
     if(self.restaurant.is_favorite === "false") {
         path[0].style.fill = ''; //todo improve - set a class and reduce double code

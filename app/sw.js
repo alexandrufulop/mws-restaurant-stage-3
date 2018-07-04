@@ -119,79 +119,61 @@ self.addEventListener('sync', function (event) {
 
     /* Add/Remove resto from favourites */
     if (event.tag === 'favourite') {
-        event.waitUntil(fav());
+        event.waitUntil(runFavQueue());
     }
 
 });
 
+//WORK IN PROGRESS -> how does sync reschedule?
+/* Must return promise */
+/* runFavQueue */
+function  runFavQueue() {
 
-let fav = () => {
+    return store.temp('readonly').then(temp => {
+        console.log("temp data", temp);
+        return temp.getAll();
+    })
+        .then(PendingRequests => {
+            console.log('Pending requests', PendingRequests);
+            return Promise.all(PendingRequests.map(request =>
+            {
+                console.log('Pending request', request);
+                return fetch(request.data.url,{method: 'PUT'})
+                    .then(response => {
+                        console.log('fetch ok');
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('data from fetch ', data);
+                        return store.temp('readwrite')
+                            .then(temp => {
+                                return temp.delete(request.id);
+                            });
+                    })
 
-    //debug
-    console.log('Running sync event -> add to favourites in sw.js');
-
-    // IndexDB
-    let databaseName = 'temp';
-    let dbObject = 'favorites';
-
-    //we open/create a new iDB
-    const dbPromise = idb.open(databaseName, 1).catch(function(){
-        console.log('Info: No pending requests to process...');
-    });
-
-    //debug
-    //console.log('sw proc',dbPromise);
-
-    //we add the url to be fetched into the indexDB
-    return dbPromise.then(function(db) {
-        //console.log(db, url);
-        let tx = db.transaction(dbObject, 'readwrite');
-
-
-        dbPromise.then(db => {
-            return tx
-                .objectStore(dbObject).getAll();
-        }).then((pendingRequests) => {
-
-            //debug
-            console.log(pendingRequests);
-
-            pendingRequests.forEach((el) => {
-
-                //debug
-                console.log(`Request ID: ${el.id}`);
-                console.log(`Request Data->Url: ${el.data.url}`);
-
-
-                return fetch(el.data.url,{method: 'PUT'})
-                    .then(
-                        function(response) {
-                            if (response.status !== 200) {
-                                console.log('Error: Looks like there was a problem. Status Code: ' + response.status);
-                                //debug
-                                console.log('Success: Restaurant added to favourites!');
-                                //return false;
-                            }
-
-                            console.log('Query run ok with response:',response);
-                        })
-                        //remove the processed request from idb
-                    /*.then(function(){
-                        //const tx = db.transaction(dbObject, 'readwrite');
-                        tx.objectStore(dbObject).delete(el.id).catch((err) => (console.log('Could not remove request from idb.',err)));
-                        console.log(tx.complete);
-                        return tx.complete;
-                    })*/
-                    .catch(function(err) {
-                        console.log('Error: Could not add restaurant to favourites', err);
-                });
+            })).catch(function(err){
+                console.log(err);
             });
+        })
+}
 
 
+let store = {
+    db: null,
+
+    init: function() {
+        if (store.db) { return Promise.resolve(store.db); }
+        return idb.open('temp', 1, function(upgradeDb) {
+            upgradeDb.createObjectStore('favorites');
+        }).then(function(db) {
+            return store.db = db;
         });
+    },
 
-    });
+    temp: function(mode) {
+        return store.init().then(function(db) {
+            return db.transaction('favorites', mode).objectStore('favorites');
+        })
+    }
 };
-
-
 
