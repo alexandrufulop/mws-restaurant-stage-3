@@ -84,7 +84,7 @@ class DBHelper {
     static fetchRestaurants(callback) {
 
         /* IndexDB */
-        let databaseName = 'data-v0';
+        let databaseName = 'restaurantStorage';
         let dbObject = 'restaurants';
 
         const dbPromise = idb.open(databaseName, 1, function(upgradeDb) {
@@ -345,7 +345,7 @@ class DBHelper {
     static fetchRestaurantReviews(restaurantID,callback) {
 
         /* IndexDB */
-        let databaseName = 'data-v1'; //todo I need help here: I want to use the same iDB for both restaurants and reviews json data
+        let databaseName = 'reviewStorage'; //QUESTION: I need help here: I want to use the same iDB for both restaurants and reviews json data
         let dbObject = 'reviews';
 
         const dbPromise = idb.open(databaseName, 1, function(upgradeDb) {
@@ -365,72 +365,86 @@ class DBHelper {
         });
 
 
-        /* Get stored objects */
-        dbPromise.then(db => {
-            return db.transaction(dbObject)
-                .objectStore(dbObject).getAll();
-        }).then(function(storedData) {
+        //debug
+        //console.log('Info: Retriving reviews JSON data and storing into DB');
 
-            //if we have stored JSON data in the indexDB
-            if (storedData.length > 0) {
+        //there is no stored data so we retrieve it from the server
 
-                //debug
-                //console.log('Info: We have stored data in our ibd', storedData);
+        fetch(DBHelper.DATABASE_URL+'/reviews/?restaurant_id='+restaurantID)
+            .then(function(response) {
+                    if (response.status !== 200) {
+                        console.log('Error: Looks like there was a problem. Status Code: ' +
+                            response.status);
 
-                callback(null, storedData); //we are returning the stored data from the idb
-            }
-            else
-            {
-                //debug
-                //console.log('Info: Retriving reviews JSON data and storing into DB');
+                        callback(response.status, null);
+                    }
 
-                //there is no stored data so we retrieve it from the server
+                    //This is the JSON response from the dev server
+                    response.json().then(function(data) {
 
-                return fetch(DBHelper.DATABASE_URL+'/reviews/?restaurant_id='+restaurantID)
-                    .then(
-                        function(response) {
-                            if (response.status !== 200) {
-                                console.log('Error: Looks like there was a problem. Status Code: ' +
-                                    response.status);
+                        dbPromise.then(function(db) {
+                            let tx = db.transaction(dbObject, 'readwrite');
+                            let keyValStore = tx.objectStore(dbObject);
 
-                                callback(response.status, null);
+                            data.forEach(function(restaurant){
+                                keyValStore.put(restaurant);
+                            });
+
+                        }).then(console.log(`Review stored in iDB object ${dbObject}`))
+                            .catch(function(err){
+                            console.log(`Error: could not add data to indexDB ${databaseName}, ${dbObject}`); //debug
+                        });
+
+                        //console.log(data); //restaurants data from remote JSON //debug
+
+                        callback(null, data); //returning the data => reviews JSON
+
+                    });
+                }
+            )
+            .catch(function(err) {
+
+                console.log('Are you offline? Fetch Error', err);
+                //If fetching the reviews failed we show whatever we have cached until now FOR THIS SPECIFIC RESTAURANT
+
+                console.log('Info: Looking for stored reviews data into idb...');
+                return dbPromise.then(db => {
+                        return db.transaction(dbObject, 'readonly')
+                            .objectStore(dbObject).getAll();
+                    }).then(function(storedData) {
+
+                    //console.log('Info: Data found...',storedData);
+
+                        //if we have stored JSON data in the indexDB
+                        if (storedData.length > 0) {
+
+                            let newArr = [];
+                            //debug
+                            //console.log('Info: We have stored data in our ibd', storedData);
+                            storedData.forEach(function (row) {
+                                if(row.restaurant_id === restaurantID)
+                                {
+                                    newArr.push(row); //if the reviews are from this restaurant
+                                }
+                            });
+
+                            if(newArr.length>0)
+                            {
+                                console.log('Info: Found cached reviews for this restaurant ...',newArr);
+                                callback(null, newArr); //we are returning the stored data from the idb
                             }
 
-                            //This is the JSON response from the dev server
-                            response.json().then(function(data) {
+                        }else
+                            {
+                                //only if we don't have any review at all we show add new review...
+                                callback(err, null);  //reject no reviews found for this restaurant
+                            }
 
-                                dbPromise.then(function(db) {
-                                    let tx = db.transaction(dbObject, 'readwrite');
-                                    let keyValStore = tx.objectStore(dbObject);
 
-                                    data.forEach(function(restaurant){
-                                        keyValStore.put(restaurant);
-                                    });
+                });
 
-                                    //return tx.complete;
-                                }).then(function() {
-                                    //debug
-                                    //console.log('Success: JSON data added to indexDB!'); //debug
-                                }).catch(function(err){
-                                    console.log('Error: could not add data to indexDB!'); //debug
-                                });
+            });
 
-                                //console.log(data); //restaurants data from remote JSON //debug
-
-                                callback(null, data); //returning the data => restaurants JSON
-
-                            });
-                        }
-                    )
-                    .catch(function(err) {
-                        console.log('Error: Fetch Error', err);
-
-                        callback(err, null);
-                    });
-
-            } //end else
-
-        });
     } //end fetchRestaurantReviews() method
 
 }

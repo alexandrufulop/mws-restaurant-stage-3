@@ -1,13 +1,3 @@
-/**
- *
- * Project: mws-restaurant-stage-1
- * Generated: 30-03-2018 @ 5:03 PM
- *
- * Created by:  Mr. FÜLÖP
- * Email:       online@promoters.ro
- * Web:         https://promoters.online/
- */
-
 //we will use Jake's promises idb to process pending requests stored in iDB
 importScripts('node_modules/idb/lib/idb.js');
 
@@ -114,8 +104,8 @@ self.addEventListener('sync', function (event) {
     /* Add new review to restaurant */
     if (event.tag === 'new-review') {
         //when the form will be submited we trigger this method
-        runReq();
-        event.waitUntil(console.log(`Syncing: ${event.tag}`));
+        event.waitUntil(procReviews());
+        //event.waitUntil(console.log(`Syncing: ${event.tag}`));
     }
 
     /* Add/Remove resto from favourites */
@@ -123,13 +113,65 @@ self.addEventListener('sync', function (event) {
 
         //no way to get this working...
         //event.waitUntil(fetch('https://source.unsplash.com/daily').then((res) => console.log(res)) );
-       event.waitUntil(runReq());
+       event.waitUntil(procFavorites());
     }
 
 });
 
+/* Run pending fac queues */
+function procReviews(){
 
-function runReq(){
+    store2.temp('readonly').then(temp => {
+        console.log("temp data", temp);
+        return temp.getAll();
+    }).then(function(PendingRequests) {
+
+        return Promise.all(PendingRequests.map(function (request) {
+            console.log('Pending request', request);
+            return fetch(request.data.url, {method: 'POST'})
+                .then(response => {
+                    console.log('fetch ok');
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('data from fetch ', data);
+                    return store2.temp('readwrite')
+                        .then(temp => {
+                            return temp.delete(request.id);
+                        });
+                });
+        }));
+
+    }).catch(function(err) { console.error(err); });
+}
+
+/* Reviews storage helper */
+//I know it is ugly and duplicate code BUT I cannot spend a lifetime making this work...
+//QUESTION I would really need some help with some suggestions... Thanks!
+let store2 = {
+    db: null,
+
+    init: function() {
+        if (store2.db) { return Promise.resolve(store2.db); }
+        return idb.open('tempReviews', 1, function(upgradeDb) {
+            if (!upgradeDb.objectStoreNames.contains('reviews')) {
+                upgradeDb.createObjectStore('reviews',{keyPath: 'id'});
+            }
+        }).then(function(db) {
+            return store2.db = db;
+        });
+    },
+
+    temp: function(mode) {
+        return store2.init().then(function(db) {
+            return db.transaction('reviews', mode).objectStore('reviews');
+        })
+    }
+};
+
+
+/* Run pending fac queues */
+function procFavorites(){
 
     store.temp('readonly').then(temp => {
         console.log("temp data", temp);
@@ -155,6 +197,7 @@ function runReq(){
     }).catch(function(err) { console.error(err); });
 }
 
+/* fav storage helper */
 let store = {
     db: null,
 
@@ -176,11 +219,13 @@ let store = {
     }
 };
 
+
 // Check con
 let checkCon = () => {
     if (navigator.onLine) {
         console.log('Back online from sw');
-        runReq();
+        procFavorites();
+        procReviews();
         //QUESTION This is the only way I could manage to run the pending fetch requests from the temp IDB. The SYNC event.WaitUntil is not triggering after coming online...
         //I would really need a good explanation here. Thanks!
     }

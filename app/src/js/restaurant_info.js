@@ -203,15 +203,8 @@ let htmlReviewForm = () => {
     button.textContent = "Add a review";
     button.setAttribute('class', 'submit-button');
     button.onclick = function(){
-        //we watch the form for submission
-        document.getElementById('ModalForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+    openModal(); //opening the modal form
 
-            //when the form will be submited we trigger this method
-            submitReview(event);
-        });
-
-        openModal(); //opening the modal form
     };
 
     header.appendChild(button);
@@ -236,7 +229,7 @@ let submitReview = (event) => {
     //debugger;
 
     /* Post form data to the server using fetch api */
-   return fetch(url, {
+   fetch(url, {
         method: 'post',
         body: jsonFormData
     }).then(function(response) {
@@ -246,25 +239,91 @@ let submitReview = (event) => {
         //console.log(data); //debug response
        thankYou(event);
 
-      //CAVEAT: todo Now we need to update the cached iDB info with the new, but being offline we don't know the review ID...
-
     }).catch(function(err) {
-        //OFFLINE: sync event should take over from here...
+        //while OFFLINE
         //console.log(err); //debug
+
+       /* IndexDB */
+       let databaseName = 'tempReviews';
+       let dbObject = 'reviews';
+
+
+       const dbPromise = idb.open(databaseName, 1, function(upgradeDb) {
+
+           //debug
+           //console.log(`Info: Opening the ${databaseName} object store.`); //debug
+
+           if (!upgradeDb.objectStoreNames.contains(dbObject)) {
+               upgradeDb.createObjectStore(dbObject,{
+                   keyPath: 'id'
+               });
+
+               //console.log('Creating a new data object store for restaurants JSON.'); //debug
+           }
+       }).catch(function(){
+           console.log('Info: iDB is not available');
+       });
+
+
+       dbPromise.then(function(db) {
+           //console.log(db, url);
+           let tx = db.transaction(dbObject, 'readwrite');
+
+           //add url or modify url to temp idb in order to be processed
+           tx.objectStore(dbObject).put({
+               id: self.restaurant.id, //user can only add one review at a time for now
+               data: {url: url, body: jsonFormData}
+           });
+
+       }).catch(function(err){
+           console.log(`Error: could not add ${url} data to indexDB!`,err); //debug
+       });
 
        //Show ThankYou!
         thankYou(event);
 
-        //Showing the user
-        let el = document.getElementById('Status');
-        el.scrollIntoView();
-
     }).then(function(){
-       //add review to the page no matter if request was successful or not
-       let reviewsList = document.getElementById('reviews-list');
-       reviewsList.appendChild(createReviewHTML(jsonData));
-       reviewsList.scrollIntoView();
-   });
+       //After fetch event or offline served cached we add the review to stored ones to reflect on offline page reload
+        //add review to the page no matter if request was successful or not
+        let reviewsList = document.getElementById('reviews-list');
+        reviewsList.appendChild(createReviewHTML(jsonData));
+        reviewsList.scrollIntoView();
+
+        //Now we append the new offline review to the current cached reviews so that if the user refreshes the page while offline the newly added review would be visible...
+        //BUT THE ISSUE IS that we do not know the future id that this review will have.
+        //We could check the last id of all the reviews but that is another request more... :|
+            /* IndexDB
+
+        let databaseName2 = 'reviewStorage'; //QUESTION: I need help here: I want to use the same iDB for both restaurants and reviews json data
+        let dbObject2 = 'reviews';
+
+        const dbPromise2 = idb.open(databaseName2, 1, function(upgradeDb) {
+
+            //debug
+            //console.log(`Info: Opening the ${databaseName} object store.`); //debug
+
+            if (!upgradeDb.objectStoreNames.contains(dbObject2)) {
+                upgradeDb.createObjectStore(dbObject2);
+
+                //console.log('Creating a new data object store for restaurants JSON.'); //debug
+            }
+        }).catch(function(){
+            console.log('Info: iDB is not available');
+        });
+
+        dbPromise2.then(function(db) {
+            let tx = db.transaction(dbObject2, 'readwrite');
+            let keyValStore = tx.objectStore(dbObject2);
+            keyValStore.put({
+                data: {url: url, body: jsonFormData}
+            });
+
+        }).catch(function(err){
+            console.log(`Error: could not add data to indexDB ${databaseName}, ${dbObject}`); //debug
+        });
+                */
+
+    });
 
 
 
@@ -490,7 +549,7 @@ let addToFavorites = () => {
 
                     //Modify this restaurant stored data to reflect the favourite change.. Otherwise the cached version will be old
                     /* IndexDB */
-                    let databaseNameR = 'data-v0';
+                    let databaseNameR = 'restaurantStorage';
                     let dbObjectR = 'restaurants';
 
                     let dbPromiseR = idb.open(databaseNameR, 1).catch(console.log('Info: Database is not available'));

@@ -21,9 +21,9 @@
           "Sunday": "12:00 pm - 4:00 pm, 5:30 pm - 11:00 pm"
         },
         "createdAt": 1504095563444,
-        "updatedAt": "2018-07-04T15:39:39.136Z",
+        "updatedAt": "2018-07-05T19:12:58.745Z",
         "id": 1,
-        "is_favorite": "false"
+        "is_favorite": "true"
       },
       {
         "name": "Emily",
@@ -45,8 +45,8 @@
           "Sunday": "12:00 pm - 3:00 pm, 5:00 pm - 11:00 pm"
         },
         "createdAt": 1504095568414,
-        "updatedAt": "2018-07-05T13:13:13.759Z",
-        "is_favorite": "true",
+        "updatedAt": "2018-07-05T19:04:52.148Z",
+        "is_favorite": "false",
         "id": 2
       },
       {
@@ -93,8 +93,8 @@
           "Sunday": "Sat - 10:30 pm"
         },
         "createdAt": 1504095567091,
-        "updatedAt": "2018-07-05T13:13:13.763Z",
-        "is_favorite": "true",
+        "updatedAt": "2018-07-05T19:04:56.975Z",
+        "is_favorite": "false",
         "id": 4
       },
       {
@@ -141,8 +141,8 @@
           "Sunday": "12:00 pm - 9:00 pm"
         },
         "createdAt": 1504095567071,
-        "updatedAt": 1504095567071,
-        "is_favorite": false,
+        "updatedAt": "2018-07-05T19:05:40.715Z",
+        "is_favorite": "true",
         "id": 6
       },
       {
@@ -165,8 +165,8 @@
           "Sunday": "11:30 am - 10:00 pm"
         },
         "createdAt": 1504095567091,
-        "updatedAt": 1504095567091,
-        "is_favorite": false,
+        "updatedAt": "2018-07-05T19:01:43.005Z",
+        "is_favorite": "false",
         "id": 7
       },
       {
@@ -189,7 +189,7 @@
           "Sunday": "10:00 am - 3:00 pm, 5:30 pm - 11:00 pm"
         },
         "createdAt": 1504095567091,
-        "updatedAt": "2018-07-05T13:13:13.767Z",
+        "updatedAt": "2018-07-05T19:21:11.359Z",
         "is_favorite": "false",
         "id": 8
       },
@@ -213,8 +213,8 @@
           "Sunday": "5:00 pm - 10:00 pm"
         },
         "createdAt": 1504095567191,
-        "updatedAt": "2018-07-05T13:13:54.018Z",
-        "is_favorite": "false",
+        "updatedAt": "2018-07-05T19:05:40.731Z",
+        "is_favorite": "true",
         "id": 9
       },
       {
@@ -511,6 +511,121 @@
         "updatedAt": 1504095567183,
         "rating": 4,
         "comments": "For a Michelin star restaurant, it's fairly priced and the food is fairly good. Started with a strawberry margarita which was good in flavor but not much alcohol. Had the chicken enchiladas with salsa verde and it was really good. Great balance in flavor and a good portion. Extra tasty with their hot sauces. My wife had the lamb but it was a bit too salty for our taste. Although, it was cooked very well and fell off the bone. The highlight of the night was the tres leches cake. Probably the best I've ever had to be honest. Not too sweet and very milky. Overall, one of my top 3 favorite Mexican in NY."
+      },
+      {
+        "name": "test",
+        "stars": "5",
+        "rating": "3",
+        "comments": "test",
+        "restaurant_id": 2,
+        "createdAt": 1530797822185,
+        "updatedAt": "2018-07-05T13:37:02.215Z",
+        "id": 34
+      },
+      {
+        "name": "test",
+        "stars": "5",
+        "rating": "3",
+        "comments": "test",
+        "restaurant_id": 2,
+        "createdAt": 1530797822186,
+        "updatedAt": "2018-07-05T13:37:02.222Z",
+        "id": 35
+      },
+      {
+        "name": "online",
+        "stars": "5",
+        "rating": "1",
+        "comments": "online\n",
+        "restaurant_id": 3,
+        "createdAt": 1530798276247,
+        "updatedAt": "2018-07-05T13:44:36.252Z",
+        "id": 36
+      },
+      {
+        "name": "online",
+        "stars": "5",
+        "rating": "1",
+        "comments": "online\n",
+        "restaurant_id": 3,
+        "createdAt": 1530798276248,
+        "updatedAt": "2018-07-05T13:44:36.261Z",
+        "id": 37
+      },
+      {
+        "name": "oo",
+        "stars": "5",
+        "rating": "1",
+        "comments": "oo",
+        "restaurant_id": 3,
+        "createdAt": 1530798411936,
+        "updatedAt": "2018-07-05T13:46:51.942Z",
+        "id": 38
+      },
+      {
+        "name": "asdas",
+        "stars": "5",
+        "rating": "4",
+        "comments": "asda",
+        "restaurant_id": 3,
+        "createdAt": 1530805064934,
+        "updatedAt": "2018-07-05T15:37:44.938Z",
+        "id": 39
+      },
+      {
+        "name": "new review online",
+        "stars": "5",
+        "rating": "4",
+        "comments": "new review online",
+        "restaurant_id": 10,
+        "createdAt": 1530808770880,
+        "updatedAt": "2018-07-05T16:39:30.913Z",
+        "id": 40
+      },
+      {
+        "name": "asdsa",
+        "stars": "5",
+        "rating": "3",
+        "comments": "asdas",
+        "restaurant_id": 10,
+        "createdAt": 1530808893399,
+        "updatedAt": "2018-07-05T16:41:33.405Z",
+        "id": 41
+      },
+      {
+        "name": "offline review for Mu Ramen",
+        "stars": "5",
+        "rating": "5",
+        "comments": "offline review for Mu Ramen asdasdsa",
+        "restaurant_id": 9,
+        "createdAt": 1530810155781,
+        "updatedAt": "2018-07-05T17:02:35.787Z",
+        "id": 42
+      },
+      {
+        "name": "qweqw",
+        "stars": "5",
+        "rating": "4",
+        "comments": "qweqw",
+        "restaurant_id": 6,
+        "createdAt": 1530817166180,
+        "updatedAt": "2018-07-05T18:59:26.212Z",
+        "id": 43
+      },
+      {
+        "name": "Home BBQ online review",
+        "stars": "5",
+        "rating": "4",
+        "comments": "Home BBQ online review",
+        "restaurant_id": 6,
+        "createdAt": 1530817600330,
+        "updatedAt": "2018-07-05T19:06:40.358Z",
+        "id": 44
+      },
+      {
+        "createdAt": "2018-07-05T19:21:11.343Z",
+        "updatedAt": "2018-07-05T19:21:11.343Z",
+        "id": 45
       }
     ]
   },
@@ -566,7 +681,7 @@
       "id": 10
     },
     "reviews": {
-      "id": 33
+      "id": 45
     }
   }
 }
