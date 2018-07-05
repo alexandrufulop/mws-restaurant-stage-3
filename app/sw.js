@@ -114,49 +114,46 @@ self.addEventListener('sync', function (event) {
     /* Add new review to restaurant */
     if (event.tag === 'new-review') {
         //when the form will be submited we trigger this method
-        event.waitUntil(console.log(`Syncing: ${event.tag}`)); //todo wip
+        runReq();
+        event.waitUntil(console.log(`Syncing: ${event.tag}`));
     }
 
     /* Add/Remove resto from favourites */
     if (event.tag === 'favourite') {
-        event.waitUntil(runFavQueue());
+
+        //no way to get this working...
+        //event.waitUntil(fetch('https://source.unsplash.com/daily').then((res) => console.log(res)) );
+       event.waitUntil(runReq());
     }
 
 });
 
-//WORK IN PROGRESS -> how does sync reschedule?
-/* Must return promise */
-/* runFavQueue */
-function  runFavQueue() {
 
-    return store.temp('readonly').then(temp => {
+function runReq(){
+
+    store.temp('readonly').then(temp => {
         console.log("temp data", temp);
         return temp.getAll();
-    })
-        .then(PendingRequests => {
-            console.log('Pending requests', PendingRequests);
-            return Promise.all(PendingRequests.map(request =>
-            {
-                console.log('Pending request', request);
-                return fetch(request.data.url,{method: 'PUT'})
-                    .then(response => {
-                        console.log('fetch ok');
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('data from fetch ', data);
-                        return store.temp('readwrite')
-                            .then(temp => {
-                                return temp.delete(request.id);
-                            });
-                    })
+    }).then(function(PendingRequests) {
 
-            })).catch(function(err){
-                console.log(err);
-            });
-        })
+        return Promise.all(PendingRequests.map(function (request) {
+            console.log('Pending request', request);
+            return fetch(request.data.url, {method: 'PUT'})
+                .then(response => {
+                    console.log('fetch ok');
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('data from fetch ', data);
+                    return store.temp('readwrite')
+                        .then(temp => {
+                            return temp.delete(request.id);
+                        });
+                });
+        }));
+
+    }).catch(function(err) { console.error(err); });
 }
-
 
 let store = {
     db: null,
@@ -164,7 +161,9 @@ let store = {
     init: function() {
         if (store.db) { return Promise.resolve(store.db); }
         return idb.open('temp', 1, function(upgradeDb) {
-            upgradeDb.createObjectStore('favorites');
+            if (!upgradeDb.objectStoreNames.contains('favorites')) {
+                upgradeDb.createObjectStore('favorites',{keyPath: 'id'});
+            }
         }).then(function(db) {
             return store.db = db;
         });
@@ -177,3 +176,14 @@ let store = {
     }
 };
 
+// Check con
+let checkCon = () => {
+    if (navigator.onLine) {
+        console.log('Back online from sw');
+        runReq();
+        //QUESTION This is the only way I could manage to run the pending fetch requests from the temp IDB. The SYNC event.WaitUntil is not triggering after coming online...
+        //I would really need a good explanation here. Thanks!
+    }
+};
+
+self.addEventListener('online', checkCon());

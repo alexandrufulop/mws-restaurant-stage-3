@@ -16,55 +16,56 @@ class DBHelper {
 
 
         window.addEventListener('load', function(event) {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/sw.js').then(function(registration) {
-
-                    //navigator.serviceWorker.ready = registration;??
-
-                    if ('sync' in registration)
-                    {
-                        /* Observe Add new review form submit & add sync event
-                        let ModalEl = document.getElementById('ModalForm');
-                        if(ModalEl !== undefined && ModalEl !== null)
-                        {
-                            // register sync for add new review
-                            ModalEl.addEventListener('submit', function(event) {
-                                //event.preventDefault();
-                                registration.sync.register('new-review').then(() => {
-                                    console.log('Sync registered for adding new restaurant review.');
-                                });
-                            });
-                        }*/
-
-                        /* Observe when user clicks on Favourite/Unfavorite & add sync event */
-                        let Fav = document.getElementById('Fav');
-                        if(Fav !== undefined && Fav !== null){
-
-                            Fav.addEventListener('click', function(event) {
-                                event.preventDefault();
-
-                                alert('ok');
-
-                                //call add to favorites -> we write the request into a temp iDB
-                                addToFavorites();
-                                //QUESTION: Why I can't send params/variables to the sync event from here?
-
-                                //register sync event
-                                registration.sync.register('favourite').then(() => {
-                                    console.log('Sync registered for adding new restaurant to favourites.');
-                                });
-
-                            });
-                        }
-
-                    } //end if sync is avaliable
-                }).catch(function(err) {
+            if ('serviceWorker' in navigator)
+            {
+                // Register your service worker:
+                navigator.serviceWorker.register('/sw.js').catch(function(err) {
                     console.error('ServiceWorker registration failed: ', err); // the Service Worker didn't install correctly
+                });
+
+                // When sw is ready
+                navigator.serviceWorker.ready.then(function(serviceWorkerRegistration) {
+
+                        if ('sync' in serviceWorkerRegistration)
+                        {
+                            /* Observe Add new review form submit & add sync event */
+                            let ModalEl = document.getElementById('ModalForm');
+                            if(ModalEl !== undefined && ModalEl !== null)
+                            {
+                                // register sync for add new review
+                                ModalEl.addEventListener('submit', function(event) {
+                                    event.preventDefault();
+
+                                    submitReview(event);
+
+                                    serviceWorkerRegistration.sync.register('new-review').then(() => {
+                                        console.log('Sync registered for adding new restaurant review.');
+                                    });
+                                });
+                            }
+
+                            /* Observe when user clicks on Favourite/Unfavorite & add sync event */
+                            let Fav = document.getElementById('Fav');
+                            if(Fav !== undefined && Fav !== null){
+
+                                Fav.addEventListener('click', function(event) {
+                                    event.preventDefault();
+
+                                    //call add to favorites -> we write the request into a temp iDB
+                                    addToFavorites();
+                                    //QUESTION: Why I can't send params/variables to the sync event from here?
+
+                                    //register sync event
+                                    serviceWorkerRegistration.sync.register('favourite').then(() => {
+                                        console.log('Sync registered for adding new restaurant to favourites.');
+                                    });
+
+                                });
+                            }
+                        }
                 });
             }
         });
-
-
     };
 
     /**

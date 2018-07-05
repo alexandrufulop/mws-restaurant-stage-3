@@ -422,6 +422,7 @@ let toJSONString = ( form ) => {
 /* Fav restaurant */
 /* Adds the (un)favourite request to iDB to be processed by the sw */
 //http://localhost:1337/restaurants/<restaurant_id>/?is_favorite=true
+//todo rewrite
 let addToFavorites = () => {
 
     /* IndexDB */
@@ -543,15 +544,12 @@ let favToggle = () => {
 let checkFavRestaurant = () => {
 
     console.log('Check favourite:',self.restaurant.is_favorite);
-
     let path = document.getElementById('Fav').getElementsByTagName('path');
+    path[0].style.fill = ''; //todo improve - set a class and reduce double code
 
-    if(self.restaurant.is_favorite === "false") {
-        path[0].style.fill = ''; //todo improve - set a class and reduce double code
+    if(self.restaurant.is_favorite === "true") {
+        path[0].style.fill = '#F05228'; //todo improve - set a class and reduce double code
+
     }
-    else
-        {
-            path[0].style.fill = '#F05228'; //todo improve - set a class and reduce double code
-        }
 
 };
