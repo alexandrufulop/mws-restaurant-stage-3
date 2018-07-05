@@ -128,7 +128,7 @@ function procReviews(){
 
         return Promise.all(PendingRequests.map(function (request) {
             console.log('Pending request', request);
-            return fetch(request.data.url, {method: 'POST'})
+            return fetch(request.data.url, {method: 'POST', body: request.data.body})
                 .then(response => {
                     console.log('fetch ok');
                     return response.json();

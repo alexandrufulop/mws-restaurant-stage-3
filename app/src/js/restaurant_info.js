@@ -266,7 +266,11 @@ let submitReview = (event) => {
 
 
        dbPromise.then(function(db) {
-           //console.log(db, url);
+           console.log('DATA TO STORE:',{
+               id: self.restaurant.id, //user can only add one review at a time for now
+               data: {url: url, body: jsonFormData}
+           });
+
            let tx = db.transaction(dbObject, 'readwrite');
 
            //add url or modify url to temp idb in order to be processed
